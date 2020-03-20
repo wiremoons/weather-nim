@@ -43,7 +43,7 @@ One of the key beneifts of having an application developed in Nim is that the re
 **ADD MORE INFO HERE**
 
 
-## Licesne
+## License
 
 The application is provided under the MIT open source license. The license file is [here](./LICENSE).
 
