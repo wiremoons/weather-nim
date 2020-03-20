@@ -1,3 +1,5 @@
+# directories to exclude form Git repo
 nimcache/
 nimblecache/
 htmldocs/
+bin/
