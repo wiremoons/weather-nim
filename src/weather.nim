@@ -36,17 +36,29 @@ proc returnWebSiteData(webUrl: string): string =
   var client = newAsyncHttpClient()
   let response = waitfor client.get(webUrl)
   let rawWebData = waitfor response.body
+  let webHeaders = response.headers
 
   if response.code != Http200:
     stderr.writeLine "\nFATAL ERROR: web site returned unexpected status of: ",
         response.status, "\n"
     stderr.writeLIne "Data received:\n\n", rawWebData, "\n\n"
+    close(client)
     quit 1
 
   if rawWebData.len == 0:
     stderr.writeLine "\nFATAL ERROR: no data received from web site"
+    close(client)
     quit 2
 
+  # echo "Headers received: ", webHeaders, "\n\n" 
+#  
+  # if response.headers.hasKey("x-forecast-api-calls"): 
+    # echo "found",response.headers["x-forcast-api-calls"] 
+  # else: 
+    # echo "None" 
+
+
+  close(client)
   result = rawWebData
 
 
@@ -80,25 +92,27 @@ proc showHelp() =
 proc showVersion() =
   ##
   ## PROCEDURE: showVersion
-  ## display app version information requested by the user
-  ##
+  ## display the app version, build kind, build date, compiler ver
+  ##.format("dddd dd MMM yyyy '@' hh:mm tt")
   echo ""
+  echo "'",paramStr(0),"' is version: '"
+  echo "Copyright (c) 2020 Simon Rowe"
+  echo "Compiled on: ",CompileDate," @ ",CompileTime
   when not defined(release):
-    echo "Compiled as a 'debug' binary with Nim compiler version: ", NimVersion
+    echo "Build is: 'debug' using Nim compiler version: ", NimVersion
   else:
-    echo "Compiled as a 'release' binary with Nim compiler version: ", NimVersion
+    echo "Build is: 'release' using Nim compiler version: ", NimVersion
   echo ""
-  #echo "Program built on: ", buildDate
+  echo "For licenses and further information visit:"
+  echo " - Weather application :  https://github.com/wiremoons/weather-nim/"
+  echo " - Nim Complier        :  https://github.com/nim-lang/Nim/"
+  echo ""
+  echo "All is well."
 
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
 #///////////////////////////////////////////////////////////////
-
-# nimble -d:buildDate="$(date)" build weather
-#const buildDate {.strdefine.}: string = now().format("dddd dd MMM yyyy '@' hh:mm tt")
-#const buildDate {.strdefine.}: string = "Thu 26 Dec 08:40:05  2019"
-#echo buildDate
 
 # JSON packages parse:
 # https://forum.nim-lang.org/t/5730
@@ -163,4 +177,4 @@ echo ""
 echo "Weather forecast data: Powered by Dark Sky™"
 echo "Visit: https://darksky.net/poweredby/"
 echo ""
-echo "All is well"
+echo "All is well."
