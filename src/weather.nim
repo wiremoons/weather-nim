@@ -50,13 +50,8 @@ proc returnWebSiteData(webUrl: string): string =
     close(client)
     quit 2
 
-  # echo "Headers received: ", webHeaders, "\n\n" 
-#  
-  # if response.headers.hasKey("x-forecast-api-calls"): 
-    # echo "found",response.headers["x-forcast-api-calls"] 
-  # else: 
-    # echo "None" 
-
+  if webHeaders.hasKey "x-forecast-api-calls":
+    echo "API Calls made: ",webHeaders["x-forecast-api-calls"]
 
   close(client)
   result = rawWebData
@@ -150,31 +145,34 @@ let time = fromUnix(weatherJson{"currently"}{"time"}.getInt(0))
 let summary = weatherJson{"currently"}{"summary"}.getStr("no data")
 let windspeed = weatherJson{"currently"}{"windSpeed"}.getFloat(0.0)
 let temperature = weatherJson{"currently"}{"temperature"}.getFloat(0.0)
-let feelsLikeTemp = weatherJson{"currently"}{
-    "apparentTemperature"}.getFloat(0.0)
+let feelsLikeTemp = weatherJson{"currently"}{"apparentTemperature"}.getFloat(0.0)
 let uvIndex = weatherJson{"currently"}{"uvIndex"}.getInt(0)
 let daysOutlook = weatherJson["daily"]["summary"].getStr("no data")
 
+# obtain variables with better formating for output
+let timeStr = time.format("dddd dd MMM yyyy '@' hh:mm tt")
+
 # Output forecast all data to the screen:
-echo ""
-echo "∞∞ Forecast ∞∞\n"
-echo "» Weather timezone is : ", timezone
-echo "» Weather location is : '", placeName, "' at longitude: '", longitude,
-    "' and latitide: '", latitude, "'"
-echo "» Forecast Date       : ", time.format("dddd dd MMM yyyy '@' hh:mm tt")
-echo ""
-echo "» Weather Currenty:"
-echo "    Summary     : '", summary, "'"
-echo "    Windspeed   : ", fmt("{windspeed:3.1f}"), " mph"
-echo "    Temperature : ", fmt("{temperature:3.1f}"), "°C feels like: ",
-   fmt("{feelsLikeTemp:3.1f}"), "°C"
-echo "    UV Index    : ", uvIndex
-echo ""
-echo "» Days Outlook:"
-echo "    Summary     : '", daysOutlook, "'"
-echo ""
-echo ""
-echo "Weather forecast data: Powered by Dark Sky™"
-echo "Visit: https://darksky.net/poweredby/"
-echo ""
-echo "All is well."
+echo fmt"""
+∞∞ Forecast ∞∞
+
+ » Weather timezone is : {timezone}
+ » Weather location is : '{placeName}' at longitude: '{longitude}' 
+                         and latitide: '{latitude}'
+ » Forecast Date       : {timeStr}
+
+ » Weather Currenty:
+     Summary     : '{summary}'
+     Windspeed   : {windspeed:3.1f} mph
+     Temperature : {temperature:3.1f} °C feels like: {feelsLikeTemp:3.1f} °C
+     UV Index    : {uvIndex}
+
+ » Days Outlook:
+     Summary     : '{daysOutlook}'
+
+
+Weather forecast data: Powered by Dark Sky™
+Visit: https://darksky.net/poweredby/
+
+All is well.
+"""
