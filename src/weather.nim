@@ -31,7 +31,10 @@ import httpclient, asyncdispatch, json, times, strformat, os
 proc returnWebSiteData(webUrl: string): string =
   ##
   ## PROCEDURE: returnWebSiteData
-  ## open the provided URL returning the web site content received
+  ## Input: final URL for DarkSky site to obtain forecast
+  ## Returns: raw web page body recieved and daily API calls count
+  ## Description: open the provided URL returning the web site content received
+  ## also extract HTTP header to obtain API calls total.
   ##
   var client = newAsyncHttpClient()
   let response = waitfor client.get(webUrl)
@@ -51,7 +54,7 @@ proc returnWebSiteData(webUrl: string): string =
     quit 2
 
   if webHeaders.hasKey "x-forecast-api-calls":
-    echo "API Calls made: ",webHeaders["x-forecast-api-calls"]
+    echo "API Calls made: ", webHeaders["x-forecast-api-calls"]
 
   close(client)
   result = rawWebData
@@ -60,8 +63,10 @@ proc returnWebSiteData(webUrl: string): string =
 proc returnParsedJson(rawJsonData: string): JsonNode =
   ##
   ## PROCEDURE: returnParsedJson
-  ## read raw json data passed to the function and try to convert into
-  ## a JSON node object. Raise an exception on failure and quit program.
+  ## Input: raw web page body containing JSON data from DarkSky web site
+  ## Returns: populated JsonNode containing weather forecast requested
+  ## Description: read raw json data passed to the function and try to convert
+  ## it into a JSON node object. If fails then raise an exception.
   ##
   try:
     var parsedJson = parseJson(rawJsonData)
@@ -79,30 +84,43 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
 proc showHelp() =
   ##
   ## PROCEDURE: showHelp
-  ## display command line help information requested by the user
+  ## Input: none required
+  ## Returns: outputs help information to the display then quits the program
+  ## Description: display command line help information requested by the user
   ##
   echo "TODO: add help output here!"
+  quit 0
 
 
 proc showVersion() =
   ##
   ## PROCEDURE: showVersion
-  ## display the app version, build kind, build date, compiler ver
-  ##.format("dddd dd MMM yyyy '@' hh:mm tt")
-  echo ""
-  echo "'",paramStr(0),"' is version: '"
-  echo "Copyright (c) 2020 Simon Rowe"
-  echo "Compiled on: ",CompileDate," @ ",CompileTime
+  ## Input: none required
+  ## Returns: outputs version information for the application and quits program
+  ## Description: display the app version, build kind, build date, compiler
+  ## version, plus license information sources.
+  ##
   when not defined(release):
-    echo "Build is: 'debug' using Nim compiler version: ", NimVersion
+    let buildV = fmt"Build is: 'debug' using Nim compiler version: {NimVersion}"
   else:
-    echo "Build is: 'release' using Nim compiler version: ", NimVersion
-  echo ""
-  echo "For licenses and further information visit:"
-  echo " - Weather application :  https://github.com/wiremoons/weather-nim/"
-  echo " - Nim Complier        :  https://github.com/nim-lang/Nim/"
-  echo ""
-  echo "All is well."
+    let buildV = fmt"Build is: 'release' using Nim compiler version: {NimVersion}"
+    # output version information to the screen
+  echo fmt"""
+
+'{paramStr(0)}' is version: ' '
+Copyright (c) 2020 Simon Rowe
+
+Compiled on: {CompileDate} @ {CompileTime}
+{buildV}
+
+For licenses and further information visit:
+   - Weather application :  https://github.com/wiremoons/weather-nim/
+   - Nim Complier        :  https://github.com/nim-lang/Nim/
+
+All is well.
+"""
+  quit 0
+
 
 
 #///////////////////////////////////////////////////////////////
@@ -119,14 +137,11 @@ if paramCount() > 0:
   case args[0]
   of "-h", "--help":
     showHelp()
-    quit()
   of "-v", "--version":
     showVersion()
-    quit()
   else:
     echo "Unknown command line parameter given - see options below:"
     showHelp()
-    quit()
 
 # Obtain Weather forecast data
 let darkSkyUrl = "https://api.darksky.net/forecast/66fd639c6914180e12c355899c5ec267/51.419212,-3.291481?units=uk2"
