@@ -4,3 +4,5 @@ nimblecache/
 htmldocs/
 # ensure any binary file are not up loaded
 bin/*
+# file containing api keys
+keys.txt
