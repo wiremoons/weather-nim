@@ -1,4 +1,4 @@
-## Weather Forecast Retreival Tool (weather)
+## Weather Forecast Retrieval Tool (weather)
 ##
 ## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
 ## Source code available from GitHub: https://github.com/wiremoons/weather.git
@@ -122,6 +122,32 @@ All is well.
   quit 0
 
 
+proc returnPlace(jsonData: JsonNode): string =
+  ##
+  ## PROCEDURE: returnPlace
+  ## Input: JsonNode
+  ## Returns: outputs the place name found in the JSON
+  ## Description: use the JSON object to obtain place name. Use a structure to
+  ## hold unmarshaled data, before the place name is extracted
+  ##
+
+  # structure to hold unmarshaled data (created using 'nimjson' tool)
+  type
+    GeoPlace = ref object
+      results: seq[Results]
+      status: string
+    Results = ref object
+      formatted_address: string
+
+  # unmarshall 'jsonData' to object structure 'GeoPlace'
+  let place = to(jsonData, GeoPlace)
+  if place.status == "OK":
+    # extract one value 'formatted_address' from 'results' seq:
+    for item in place[].results:
+      result = item[].formatted_address
+  else:
+    echo fmt"ERROR: 'returnPlace' JSON has status: '{place[].status}'"
+    result = "UNKNOWN"
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
@@ -144,13 +170,20 @@ if paramCount() > 0:
     showHelp()
 
 # Obtain Weather forecast data
-let darkSkyUrl = "https://api.darksky.net/forecast/66fd639c6914180e12c355899c5ec267/51.419212,-3.291481?units=uk2"
+let darkSkyUrl = "https://api.darksky.net/forecast/66fd639c6914180e12c355899c5ec267/51.419212,-3.291481?units=uk2&exclude=minutely,hourly"
 let rawWeatherData = returnWebSiteData(darkSkyUrl)
 let weatherJson = returnParsedJson(rawWeatherData)
 
 # Obtain Geo Location data
 # add addtional call to Google API to grab real place name from long+lat
-let placeName = "ADD ME"
+
+let latlong = "latlng=51.419212,-3.291481"
+let apiKey = getEnv("GAPI")
+let geoKey = fmt"&key={apiKey}"
+let googlePlaceUrl = fmt"https://maps.googleapis.com/maps/api/geocode/json?{latlong}&result_type=locality&{geoKey}"
+let rawGeoData = returnWebSiteData(googlePlaceUrl)
+let placeJson = returnParsedJson(rawGeoData)
+let placeName = returnPlace(placeJson)
 
 # get values needed from weather forcast JSON data:
 let timezone = weatherJson{"timezone"}.getStr("no data")
@@ -169,11 +202,14 @@ let timeStr = time.format("dddd dd MMM yyyy '@' hh:mm tt")
 
 # Output forecast all data to the screen:
 echo fmt"""
+                            WEATHER  FORECAST
+
+ » Weather timezone     : {timezone}
+ » Weather place name   : '{placeName}'
+ » Latitide & longitude : '{latitude}','{longitude}'
+
 ∞∞ Forecast ∞∞
 
- » Weather timezone is : {timezone}
- » Weather location is : '{placeName}' at longitude: '{longitude}' 
-                         and latitide: '{latitude}'
  » Forecast Date       : {timeStr}
 
  » Weather Currenty:
@@ -182,12 +218,15 @@ echo fmt"""
      Temperature : {temperature:3.1f} °C feels like: {feelsLikeTemp:3.1f} °C
      UV Index    : {uvIndex}
 
- » Days Outlook:
+ » General Outlook:
      Summary     : '{daysOutlook}'
 
+ » Alerts:
+     Status      : TODO 
 
 Weather forecast data: Powered by Dark Sky™
 Visit: https://darksky.net/poweredby/
+Daily API calls made:
 
 All is well.
 """
