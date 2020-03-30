@@ -88,7 +88,21 @@ proc showHelp() =
   ## Returns: outputs help information to the display then quits the program
   ## Description: display command line help information requested by the user
   ##
-  echo "TODO: add help output here!"
+  echo fmt"""
+Purpose
+¯¯¯¯¯¯¯
+ Use the '{paramStr(0)}' application to find the current weather forecast 
+ information for the geographical planet earth location you provide.
+ 
+Usage
+¯¯¯¯¯
+Run ./{paramStr(0)} with:
+
+    Flag      Description                          Default Value
+    ¯¯¯¯      ¯¯¯¯¯¯¯¯¯¯¯                          ¯¯¯¯¯¯¯¯¯¯¯¯¯
+    -h        display help information             false
+    -v        display program version              false
+"""
   quit 0
 
 
@@ -205,12 +219,12 @@ echo fmt"""
                             WEATHER  FORECAST
 
  » Weather timezone     : {timezone}
- » Weather place name   : '{placeName}'
- » Latitide & longitude : '{latitude}','{longitude}'
+ » Weather place name   : {placeName}
+ » Latitide & longitude : {latitude}, {longitude}
 
 ∞∞ Forecast ∞∞
 
- » Forecast Date       : {timeStr}
+ » Forecast Date        : {timeStr}
 
  » Weather Currenty:
      Summary     : '{summary}'
