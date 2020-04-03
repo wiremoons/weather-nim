@@ -132,101 +132,10 @@ proc returnPlace(jsonData: JsonNode): string =
     result = "UNKNOWN"
 
 
-
-proc showHelp() =
-  ##
-  ## PROCEDURE: showHelp
-  ## Input: none required
-  ## Returns: outputs help information to the display then quits the program
-  ## Description: display command line help information requested by the user
-  ##
-  echo fmt"""
-Purpose
-¯¯¯¯¯¯¯
- Use the '{paramStr(0)}' application to find the current weather forecast
- information for the geographical planet earth location you provide.
-
-Usage
-¯¯¯¯¯
-Run ./{paramStr(0)} with:
-
-    Flag      Description                          Default Value
-    ¯¯¯¯      ¯¯¯¯¯¯¯¯¯¯¯                          ¯¯¯¯¯¯¯¯¯¯¯¯¯
-    -h        display help information             false
-    -v        display program version              false
-"""
-  quit 0
-
-
-proc showVersion() =
-  ##
-  ## PROCEDURE: showVersion
-  ## Input: none required
-  ## Returns: outputs version information for the application and quits program
-  ## Description: display the app version, build kind, build date, compiler
-  ## version, plus license information sources.
-  ##
-  when not defined(release):
-    let buildV = fmt"Build is: 'debug' using Nim compiler version: {NimVersion}"
-  else:
-    let buildV = fmt"Build is: 'release' using Nim compiler version: {NimVersion}"
-    # output version information to the screen
-  echo fmt"""
-
-'{paramStr(0)}' is version: '0.5.0'
-Copyright (c) 2020 Simon Rowe
-
-Compiled on: {CompileDate} @ {CompileTime}
-{buildV}
-
-For licenses and further information visit:
-   - Weather application :  https://github.com/wiremoons/weather-nim/
-   - Nim Complier        :  https://github.com/nim-lang/Nim/
-
-All is well.
-"""
-  quit 0
-
-
-proc showWeather() =
-  ##
-  ## PROCEDURE: showWeather
-  ## Input: none required
-  ## Returns: outputs the weather forecast data obtainned
-  ## Description: display the weather forecats information
-  ##
-
-  # Output forecast all data to the screen:
-  echo fmt"""
-
-                            WEATHER  FORECAST
-
- » Weather timezone     : {Wthr.timezone}
- » Weather place name   : {Wthr.placeName}
- » Latitide & longitude : {Wthr.latitude}, {Wthr.longitude}
-
-∞∞ Forecast ∞∞
-
- » Forecast Date        : {Wthr.timeFormated}
-
- » Weather Currenty:
-     Summary     : '{Wthr.summary}'
-     Windspeed   : {Wthr.windspeed:3.1f} mph
-     Temperature : {Wthr.temperature:3.1f}°C feels like: {Wthr.feelsLikeTemp:3.1f}°C
-     UV Index    : {Wthr.uvIndex}
-
- » General Outlook:
-     Summary     : '{Wthr.daysOutlook}'
-
- » Alerts:
-     Status      : TODO
-
-Weather forecast data: Powered by Dark Sky™
-Visit: https://darksky.net/poweredby/
-Daily Dark Sky API calls made: {Wthr.dsApiCalls}
-
-All is well.
-"""
+# include source cod here from other supporting files:
+include version
+include help
+include weatherOutput
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
