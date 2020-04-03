@@ -25,10 +25,30 @@
 # IN THE SOFTWARE.
 #
 
+# import required Nim standard libraries
 import httpclient, asyncdispatch, json, times, strformat, os
 
+# object to hold and collate all weather related data needed
+type
+  WeatherObj = object
+    timezone: string
+    longitude: float
+    latitude: float
+    forecastTime: Time
+    summary: string
+    windspeed: float
+    temperature: float
+    feelsLikeTemp: float
+    uvIndex: int
+    daysOutlook: string
+    timeFormated: string #DateTime
+    dsAPICalls: string
+    placeName: string
 
-proc returnWebSiteData(webUrl: string): string =
+var Wthr = WeatherObj()
+
+
+proc returnWebSiteData(webUrl: string, Wthr: var WeatherObj): string =
   ##
   ## PROCEDURE: returnWebSiteData
   ## Input: final URL for DarkSky site to obtain forecast
@@ -54,7 +74,7 @@ proc returnWebSiteData(webUrl: string): string =
     quit 2
 
   if webHeaders.hasKey "x-forecast-api-calls":
-    echo "API Calls made: ", webHeaders["x-forecast-api-calls"]
+    Wthr.dsApiCalls = webHeaders["x-forecast-api-calls"]
 
   close(client)
   result = rawWebData
@@ -80,6 +100,38 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
   except:
     echo "Unknown exception error when parsing JSON!"
 
+proc returnPlace(jsonData: JsonNode): string =
+  ##
+  ## PROCEDURE: returnPlace
+  ## Input: JsonNode
+  ## Returns: outputs the place name found in the JSON
+  ## Description: use the JSON object to obtain place name. Use a structure to
+  ## hold unmarshaled data, before the place name is extracted
+  ##
+
+  # structure to hold unmarshaled data (created using 'nimjson' tool)
+  type
+    GeoPlace = ref object
+      results: seq[Results]
+      status: string
+    Results = ref object
+      formatted_address: string
+
+  # unmarshall 'jsonData' to object structure 'GeoPlace'
+  let place: GeoPlace = to(jsonData, GeoPlace)
+  if place.status == "OK":
+    # extract one value 'formatted_address' from 'results' seq:
+    for item in place[].results:
+      result = item[].formatted_address
+  else:
+    if place[].status == "REQUEST_DENIED":
+      echo fmt"ERROR: proc 'returnPlace' has request status : '{place[].status}'."
+      echo "Check the Google Places API key is correct and available."
+    else:
+      echo fmt"ERROR: proc 'returnPlace' has request status : '{place[].status}'."
+    result = "UNKNOWN"
+
+
 
 proc showHelp() =
   ##
@@ -91,9 +143,9 @@ proc showHelp() =
   echo fmt"""
 Purpose
 ¯¯¯¯¯¯¯
- Use the '{paramStr(0)}' application to find the current weather forecast 
+ Use the '{paramStr(0)}' application to find the current weather forecast
  information for the geographical planet earth location you provide.
- 
+
 Usage
 ¯¯¯¯¯
 Run ./{paramStr(0)} with:
@@ -121,7 +173,7 @@ proc showVersion() =
     # output version information to the screen
   echo fmt"""
 
-'{paramStr(0)}' is version: '0.4.0'
+'{paramStr(0)}' is version: '0.5.0'
 Copyright (c) 2020 Simon Rowe
 
 Compiled on: {CompileDate} @ {CompileTime}
@@ -136,32 +188,45 @@ All is well.
   quit 0
 
 
-proc returnPlace(jsonData: JsonNode): string =
+proc showWeather() =
   ##
-  ## PROCEDURE: returnPlace
-  ## Input: JsonNode
-  ## Returns: outputs the place name found in the JSON
-  ## Description: use the JSON object to obtain place name. Use a structure to
-  ## hold unmarshaled data, before the place name is extracted
+  ## PROCEDURE: showWeather
+  ## Input: none required
+  ## Returns: outputs the weather forecast data obtainned
+  ## Description: display the weather forecats information
   ##
 
-  # structure to hold unmarshaled data (created using 'nimjson' tool)
-  type
-    GeoPlace = ref object
-      results: seq[Results]
-      status: string
-    Results = ref object
-      formatted_address: string
+  # Output forecast all data to the screen:
+  echo fmt"""
 
-  # unmarshall 'jsonData' to object structure 'GeoPlace'
-  let place = to(jsonData, GeoPlace)
-  if place.status == "OK":
-    # extract one value 'formatted_address' from 'results' seq:
-    for item in place[].results:
-      result = item[].formatted_address
-  else:
-    echo fmt"ERROR: 'returnPlace' JSON has status: '{place[].status}'"
-    result = "UNKNOWN"
+                            WEATHER  FORECAST
+
+ » Weather timezone     : {Wthr.timezone}
+ » Weather place name   : {Wthr.placeName}
+ » Latitide & longitude : {Wthr.latitude}, {Wthr.longitude}
+
+∞∞ Forecast ∞∞
+
+ » Forecast Date        : {Wthr.timeFormated}
+
+ » Weather Currenty:
+     Summary     : '{Wthr.summary}'
+     Windspeed   : {Wthr.windspeed:3.1f} mph
+     Temperature : {Wthr.temperature:3.1f}°C feels like: {Wthr.feelsLikeTemp:3.1f}°C
+     UV Index    : {Wthr.uvIndex}
+
+ » General Outlook:
+     Summary     : '{Wthr.daysOutlook}'
+
+ » Alerts:
+     Status      : TODO
+
+Weather forecast data: Powered by Dark Sky™
+Visit: https://darksky.net/poweredby/
+Daily Dark Sky API calls made: {Wthr.dsApiCalls}
+
+All is well.
+"""
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
@@ -185,7 +250,7 @@ if paramCount() > 0:
 
 # Obtain Weather forecast data
 let darkSkyUrl = "https://api.darksky.net/forecast/66fd639c6914180e12c355899c5ec267/51.419212,-3.291481?units=uk2&exclude=minutely,hourly"
-let rawWeatherData = returnWebSiteData(darkSkyUrl)
+let rawWeatherData = returnWebSiteData(darkSkyUrl, Wthr)
 let weatherJson = returnParsedJson(rawWeatherData)
 
 # Obtain Geo Location data
@@ -195,52 +260,27 @@ let latlong = "latlng=51.419212,-3.291481"
 let apiKey = getEnv("GAPI")
 let geoKey = fmt"&key={apiKey}"
 let googlePlaceUrl = fmt"https://maps.googleapis.com/maps/api/geocode/json?{latlong}&result_type=locality&{geoKey}"
-let rawGeoData = returnWebSiteData(googlePlaceUrl)
+let rawGeoData = returnWebSiteData(googlePlaceUrl, Wthr)
 let placeJson = returnParsedJson(rawGeoData)
-let placeName = returnPlace(placeJson)
+Wthr.placeName = returnPlace(placeJson)
 
 # get values needed from weather forcast JSON data:
-let timezone = weatherJson{"timezone"}.getStr("no data")
-let longitude = weatherJson{"longitude"}.getFloat(0.0)
-let latitude = weatherJson{"latitude"}.getFloat(0.0)
-let time = fromUnix(weatherJson{"currently"}{"time"}.getInt(0))
-let summary = weatherJson{"currently"}{"summary"}.getStr("no data")
-let windspeed = weatherJson{"currently"}{"windSpeed"}.getFloat(0.0)
-let temperature = weatherJson{"currently"}{"temperature"}.getFloat(0.0)
-let feelsLikeTemp = weatherJson{"currently"}{"apparentTemperature"}.getFloat(0.0)
-let uvIndex = weatherJson{"currently"}{"uvIndex"}.getInt(0)
-let daysOutlook = weatherJson["daily"]["summary"].getStr("no data")
+Wthr.timezone = weatherJson{"timezone"}.getStr("no data")
+Wthr.longitude = weatherJson{"longitude"}.getFloat(0.0)
+Wthr.latitude = weatherJson{"latitude"}.getFloat(0.0)
+Wthr.forecastTime = fromUnix(weatherJson{"currently"}{"time"}.getInt(0))
+#Wthr.forecastTime = weatherJson{"currently"}{"time"}.getInt(0)
+Wthr.summary = weatherJson{"currently"}{"summary"}.getStr("no data")
+Wthr.windspeed = weatherJson{"currently"}{"windSpeed"}.getFloat(0.0)
+Wthr.temperature = weatherJson{"currently"}{"temperature"}.getFloat(0.0)
+Wthr.feelsLikeTemp = weatherJson{"currently"}{"apparentTemperature"}.getFloat(0.0)
+Wthr.uvIndex = weatherJson{"currently"}{"uvIndex"}.getInt(0)
+Wthr.daysOutlook = weatherJson["daily"]["summary"].getStr("no data")
 
 # obtain variables with better formating for output
-let timeStr = time.format("dddd dd MMM yyyy '@' hh:mm tt")
+Wthr.timeFormated = $local(Wthr.forecastTime)
+#Wthr.timeFormated = format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
+#echo format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
 
-# Output forecast all data to the screen:
-echo fmt"""
-                            WEATHER  FORECAST
-
- » Weather timezone     : {timezone}
- » Weather place name   : {placeName}
- » Latitide & longitude : {latitude}, {longitude}
-
-∞∞ Forecast ∞∞
-
- » Forecast Date        : {timeStr}
-
- » Weather Currenty:
-     Summary     : '{summary}'
-     Windspeed   : {windspeed:3.1f} mph
-     Temperature : {temperature:3.1f} °C feels like: {feelsLikeTemp:3.1f} °C
-     UV Index    : {uvIndex}
-
- » General Outlook:
-     Summary     : '{daysOutlook}'
-
- » Alerts:
-     Status      : TODO 
-
-Weather forecast data: Powered by Dark Sky™
-Visit: https://darksky.net/poweredby/
-Daily API calls made:
-
-All is well.
-"""
+# run proc to output all collated weather information
+showWeather()
