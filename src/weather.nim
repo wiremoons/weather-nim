@@ -28,7 +28,7 @@
 # import required Nim standard libraries
 import httpclient, asyncdispatch, json, times, strformat, os
 
-# object to hold and collate all weather related data needed
+# object to hold all weather related data needed
 type
   WeatherObj = object
     timezone: string
@@ -51,10 +51,11 @@ var Wthr = WeatherObj()
 proc returnWebSiteData(webUrl: string, Wthr: var WeatherObj): string =
   ##
   ## PROCEDURE: returnWebSiteData
-  ## Input: final URL for DarkSky site to obtain forecast
+  ## Input: final URL for DarkSky site to obtain forecast and WeatherObject
   ## Returns: raw web page body recieved and daily API calls count
   ## Description: open the provided URL returning the web site content received
-  ## also extract HTTP header to obtain API calls total.
+  ## also extract HTTP header to obtain API calls total. API calls total is
+  ## updated directly into the WeatherObj (Wthr) passed to the proc.
   ##
   var client = newAsyncHttpClient()
   let response = waitfor client.get(webUrl)
@@ -90,7 +91,6 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
   ##
   try:
     var parsedJson = parseJson(rawJsonData)
-    #echo "Parse completed!"
     result = parsedJson
   except JsonParsingError:
     let
@@ -100,11 +100,12 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
   except:
     echo "Unknown exception error when parsing JSON!"
 
+
 proc returnPlace(jsonData: JsonNode): string =
   ##
   ## PROCEDURE: returnPlace
-  ## Input: JsonNode
-  ## Returns: outputs the place name found in the JSON
+  ## Input: JsonNode (from Google Places API site)
+  ## Returns: outputs the place name found in the JSON node provided.
   ## Description: use the JSON object to obtain place name. Use a structure to
   ## hold unmarshaled data, before the place name is extracted
   ##
@@ -120,7 +121,7 @@ proc returnPlace(jsonData: JsonNode): string =
   # unmarshall 'jsonData' to object structure 'GeoPlace'
   let place: GeoPlace = to(jsonData, GeoPlace)
   if place.status == "OK":
-    # extract one value 'formatted_address' from 'results' seq:
+    # extract one value 'formatted_address' from 'GeoPlace.Results' seq:
     for item in place[].results:
       result = item[].formatted_address
   else:
@@ -132,7 +133,7 @@ proc returnPlace(jsonData: JsonNode): string =
     result = "UNKNOWN"
 
 
-# include source cod here from other supporting files:
+# include source code here from other supporting files:
 include version
 include help
 include weatherOutput
@@ -162,18 +163,20 @@ let darkSkyUrl = "https://api.darksky.net/forecast/66fd639c6914180e12c355899c5ec
 let rawWeatherData = returnWebSiteData(darkSkyUrl, Wthr)
 let weatherJson = returnParsedJson(rawWeatherData)
 
+
 # Obtain Geo Location data
 # add addtional call to Google API to grab real place name from long+lat
-
 let latlong = "latlng=51.419212,-3.291481"
 let apiKey = getEnv("GAPI")
 let geoKey = fmt"&key={apiKey}"
-let googlePlaceUrl = fmt"https://maps.googleapis.com/maps/api/geocode/json?{latlong}&result_type=locality&{geoKey}"
+let GoogleBaseUrl = "https://maps.googleapis.com/maps/api/geocode/json?"
+# contruct final URL to use
+let googlePlaceUrl = fmt"{GoogleBaseUrl}{latlong}&result_type=locality&{geoKey}"
 let rawGeoData = returnWebSiteData(googlePlaceUrl, Wthr)
 let placeJson = returnParsedJson(rawGeoData)
 Wthr.placeName = returnPlace(placeJson)
 
-# get values needed from weather forcast JSON data:
+# get values needed from weather forecast JSON data:
 Wthr.timezone = weatherJson{"timezone"}.getStr("no data")
 Wthr.longitude = weatherJson{"longitude"}.getFloat(0.0)
 Wthr.latitude = weatherJson{"latitude"}.getFloat(0.0)
