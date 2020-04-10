@@ -42,11 +42,11 @@ proc showVersion() =
 
   echo fmt"""
 
-'{paramStr(0)}' is version: '0.5.1'
-Copyright (c) 2020 Simon Rowe
+'{paramStr(0)}' is version: '0.5.2' running on '{hostOS}' ({hostCPU}).
+Copyright (c) 2020 Simon Rowe.
 
-Compiled on: {CompileDate} @ {CompileTime}
-{buildV}
+Compiled on: {CompileDate} @ {CompileTime}.
+{buildV}.
 
 For licenses and further information visit:
    - Weather application :  https://github.com/wiremoons/weather-nim/
