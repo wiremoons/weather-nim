@@ -1,0 +1,18 @@
+type
+  WeatherJson = ref object
+    latitude: float64
+    longitude: float64
+    timezone: string
+    currently: Currently
+    daily: Daily
+  Currently = ref object
+    time: int64
+    summary: string
+    icon: string
+    temperature: float64
+    apparentTemperature: float64
+    windSpeed: float64
+    uvIndex: int64
+  Daily = ref object
+    summary: string
+    icon: string
