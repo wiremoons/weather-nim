@@ -1,5 +1,7 @@
 ## Weather Forecast Retrieval Tool (weather)
 ##
+## SOURCE FILE: help.nim
+##
 ## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
 ## Source code available from GitHub: https://github.com/wiremoons/weather.git
 ## 
