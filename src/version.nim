@@ -1,5 +1,7 @@
 ## Weather Forecast Retrieval Tool (weather)
 ##
+## SOURCE FILE: version.nim
+##
 ## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
 ## Source code available from GitHub: https://github.com/wiremoons/weather.git
 ## 
@@ -42,15 +44,15 @@ proc showVersion() =
 
   echo fmt"""
 
-'{paramStr(0)}' is version: '0.5.2' running on '{hostOS}' ({hostCPU}).
+'{paramStr(0)}' is version: '0.5.3' running on '{hostOS}' ({hostCPU}).
 Copyright (c) 2020 Simon Rowe.
 
 Compiled on: {CompileDate} @ {CompileTime}.
 {buildV}.
 
 For licenses and further information visit:
-   - Weather application :  https://github.com/wiremoons/weather-nim/
-   - Nim Complier        :  https://github.com/nim-lang/Nim/
+   - Weather application     :  https://github.com/wiremoons/weather-nim/
+   - Nim language & compiler :  https://github.com/nim-lang/Nim/
 
 All is well.
 """
