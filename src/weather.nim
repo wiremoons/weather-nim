@@ -1,5 +1,7 @@
 ## Weather Forecast Retrieval Tool (weather)
 ##
+## SOURCE FILE: weather.nim  (main)
+##
 ## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
 ## Source code available from GitHub: https://github.com/wiremoons/weather.git
 ## 
@@ -26,7 +28,7 @@
 #
 
 # import required Nim standard libraries
-import httpclient, asyncdispatch, json, times, strformat, os
+import httpclient, asyncdispatch, json, times, strformat, os, parsecfg
 
 # object to hold all weather related data needed
 type
@@ -34,16 +36,25 @@ type
     timezone: string
     longitude: float
     latitude: float
-    forecastTime: Time
+    forecastTime: string
     summary: string
     windspeed: float
     temperature: float
     feelsLikeTemp: float
-    uvIndex: int
+    uvIndex: int64
     daysOutlook: string
     timeFormated: string #DateTime
     dsAPICalls: string
     placeName: string
+    placeCountry: string
+    placeUnits: string
+    latConfig: string
+    lonConfig: string
+    darkskyUrl: string
+    darkskyKey: string
+    darkskyExclude: string
+    googleUrl: string
+    googleKey: string
 
 var Wthr = WeatherObj()
 
@@ -100,8 +111,52 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
   except:
     echo "Unknown exception error when parsing JSON!"
 
+proc extractWeather(jsonDataWeather: JsonNode) =
+  ##
+  ## PROCEDURE: extractWeather
+  ## Input: JsonNode (from Google Places API site)
+  ## Returns: outputs the place name found in the JSON node provided.
+  ## Description: use the JSON object to obtain place name. Use a structure to
+  ## hold unmarshaled data, before the place name is extracted
+  ##
 
-proc returnPlace(jsonData: JsonNode): string =
+  # structure to hold unmarshaled data (created using 'nimjson' tool)
+  type
+    WeatherForecast = ref object
+      latitude: float64
+      longitude: float64
+      timezone: string
+      currently: Currently
+      daily: Daily
+    Currently = ref object
+      time: int64
+      summary: string
+      icon: string
+      temperature: float64
+      apparentTemperature: float64
+      windSpeed: float64
+      uvIndex: int64
+    Daily = ref object
+      summary: string
+      icon: string
+
+  # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
+  let weather: WeatherForecast = to(jsonDataWeather, WeatherForecast)
+
+  # get values needed from weather forecast JSON data:
+  Wthr.timezone = weather.timezone
+  Wthr.longitude = weather.longitude
+  Wthr.latitude = weather.latitude
+  #Wthr.forecastTime = weather.currently.time
+  Wthr.forecastTime = $fromUnix(weather.currently.time)
+  Wthr.summary = weather.currently.summary
+  Wthr.windspeed = weather.currently.windSpeed
+  Wthr.temperature = weather.currently.temperature
+  Wthr.feelsLikeTemp = weather.currently.apparentTemperature
+  Wthr.uvIndex = weather.currently.uvIndex
+  Wthr.daysOutlook = weather.daily.summary
+
+proc extractPlace(jsonDataPlace: JsonNode) =
   ##
   ## PROCEDURE: returnPlace
   ## Input: JsonNode (from Google Places API site)
@@ -119,21 +174,154 @@ proc returnPlace(jsonData: JsonNode): string =
       formatted_address: string
 
   # unmarshall 'jsonData' to object structure 'GeoPlace'
-  let place: GeoPlace = to(jsonData, GeoPlace)
+  let place: GeoPlace = to(jsonDataPlace, GeoPlace)
+
+  # check if web site request was handled - if so extract data neded:
   if place.status == "OK":
     # extract one value 'formatted_address' from 'GeoPlace.Results' seq:
     for item in place[].results:
-      result = item[].formatted_address
+      Wthr.placeName = item[].formatted_address
   else:
     if place[].status == "REQUEST_DENIED":
       echo fmt"ERROR: proc 'returnPlace' has request status : '{place[].status}'."
       echo "Check the Google Places API key is correct and available."
     else:
       echo fmt"ERROR: proc 'returnPlace' has request status : '{place[].status}'."
-    result = "UNKNOWN"
+    # no place name obtained so return as such
+    Wthr.placeName = "UNKNOWN"
+
+proc setConfigFile(): string =
+  ##
+  ## PROCEDURE: setConfigFile
+  ## Input: none required
+  ## Returns: the path and filename for the programs settings file
+  ## Description: return a suitable name a path to the settings file
+  ##
+  var confFile: string = getConfigDir() & "weatherApp"
+
+  if not dirExists(confFile):
+    when not defined(release):
+      echo fmt"DEBUG: Config directory missing: '{confFile}'... creating"
+    # TODO : capture OSError here wiht try
+    createDir(confFile)
+
+  # add file name to path
+  confFile = confFile & "/settings.ini"
+  confFile
+
+proc createDefaultSettings() =
+  ##
+  ## PROCEDURE: createDefaultSettings
+  ## Input: none required
+  ## Returns: outputs help information to the display then quits the program
+  ## Description: loads the programs settings file
+  ##
+
+  let confFileDefault: string = setConfigFile()
+
+  if existsFile(confFileDefault):
+
+    when not defined(release):
+      echo fmt"DEBUG: Config file exists: '{confFileDefault}'"
+      echo fmt"DEBUG: Loading setting from: '{confFileDefault}'"
+
+
+  when not defined(release):
+    echo fmt"DEBUG: Creating a default config file: '{confFileDefault}'"
+
+  # create a defual set of values for initial configuration
+  var dict = newConfig()
+  dict.setSectionKey("User-Loc", "placeName", "Barry")
+  dict.setSectionKey("User-Loc", "placeCountry", "UK")
+  dict.setSectionKey("User-Loc", "placeUnits", "uk")
+  dict.setSectionKey("User-Loc", "latConfig", "51.419212")
+  dict.setSectionKey("User-Loc", "lonConfig", "-3.291481")
+  dict.setSectionKey("Weather", "darkskyUrl", "https://api.darksky.net/forecast/")
+  dict.setSectionKey("Weather", "darkskyKey", "66fd639c6914180e12c355899c5ec267")
+  dict.setSectionKey("Weather", "darkskyExclude", "minutely,hourly")
+  dict.setSectionKey("Weather", "googleUrl", "https://maps.googleapis.com/maps/api/geocode/json?")
+  dict.setSectionKey("Weather", "googleKey", "")
+  dict.writeConfig(confFileDefault)
+
+  when not defined(release):
+    echo fmt"DEBUG: Created new default config file: '{confFileDefault}'"
+
+
+proc getSettings(): bool =
+  ##
+  ## PROCEDURE: getSettings
+  ## Input: none required
+  ## Returns: outputs help information to the display then quits the program
+  ## Description: loads the programs settings file
+  ##
+  let confFile: string = setConfigFile()
+
+  if existsFile(confFile):
+
+    when not defined(release):
+      echo fmt"DEBUG: Config file exists: '{confFile}'"
+      echo fmt"DEBUG: Loading setting from: '{confFile}'"
+
+    var dict = loadConfig(confFile)
+    Wthr.placeName = dict.getSectionValue("User-Loc", "placeName")
+    Wthr.placeCountry = dict.getSectionValue("User-Loc", "placeCountry")
+    Wthr.placeUnits = dict.getSectionValue("User-Loc", "placeUnits")
+    Wthr.latConfig = dict.getSectionValue("User-Loc", "latConfig")
+    Wthr.lonConfig = dict.getSectionValue("User-Loc", "lonConfig")
+    Wthr.darkskyUrl = dict.getSectionValue("Weather", "darkskyUrl")
+    Wthr.darkskyKey = dict.getSectionValue("Weather", "darkskyKey")
+    Wthr.darkskyExclude = dict.getSectionValue("Weather", "darkskyExclude")
+    Wthr.googleUrl = dict.getSectionValue("Weather", "googleUrl")
+    Wthr.googleKey = dict.getSectionValue("Weather", "googleKey")
+
+    when not defined(release):
+      echo fmt"DEBUG: Config file contents: '{confFile}' are:"
+      echo Wthr.placeName & "\n" & Wthr.placeCountry & "\n" & Wthr.placeUnits
+      echo Wthr.latConfig & "\n" & Wthr.lonConfig & "\n" & Wthr.darkskyUrl
+      echo Wthr.darkskyKey & "\n" & Wthr.darkskyExclude
+      echo Wthr.googleUrl & "\n" & Wthr.googleKey
+
+    result = true
+
+  else:
+    when not defined(release):
+      echo fmt"DEBUG: Missing config file: '{confFile}'"
+
+    result = false
+
+
+proc putSettings() =
+  ##
+  ## PROCEDURE: putSettings
+  ## Input: none required
+  ## Returns: none
+  ## Description: writes the programs settings file
+  ##
+  let confFile: string = setConfigFile()
+
+  if not existsFile(confFile):
+    when not defined(release):
+      echo fmt"DEBUG: Missing config file: '{confFile}'... creating new"
+
+  var dict = newConfig()
+  dict.setSectionKey("User-Loc", "placeName", Wthr.placeName)
+  dict.setSectionKey("User-Loc", "placeCountry", Wthr.placeCountry)
+  dict.setSectionKey("User-Loc", "placeUnits", Wthr.placeUnits)
+  dict.setSectionKey("User-Loc", "latConfig", Wthr.latConfig)
+  dict.setSectionKey("User-Loc", "lonConfig", Wthr.lonConfig)
+  dict.setSectionKey("Weather", "darkskyUrl", Wthr.darkskyUrl)
+  dict.setSectionKey("Weather", "darkskyKey", Wthr.darkskyKey)
+  dict.setSectionKey("Weather", "darkskyExclude", Wthr.darkskyExclude)
+  dict.setSectionKey("Weather", "googleUrl", Wthr.googleUrl)
+  dict.setSectionKey("Weather", "googleKey", Wthr.googleKey)
+  dict.writeConfig(confFile)
+
+  when not defined(release):
+    echo fmt"DEBUG: Created new config file: '{confFile}'"
 
 
 # include source code here from other supporting files:
+#include settings
 include version
 include help
 include weatherOutput
@@ -158,41 +346,59 @@ if paramCount() > 0:
     echo "Unknown command line parameter given - see options below:"
     showHelp()
 
-# Obtain Weather forecast data
-let darkSkyUrl = "https://api.darksky.net/forecast/66fd639c6914180e12c355899c5ec267/51.419212,-3.291481?units=uk2&exclude=minutely,hourly"
-let rawWeatherData = returnWebSiteData(darkSkyUrl, Wthr)
+# get setting if exist - if not create them...
+while not getSettings():
+  createDefaultSettings()
+
+
+# create combined latitude and longitude variable for Urls:
+let latlong = fmt"{Wthr.latConfig},{Wthr.lonConfig}"
+
+# contruct DarkSky URL from settings:
+var darkSkyUrlFin: string
+darkSkyUrlFin = fmt"{Wthr.darkskyUrl}{Wthr.darkskyKey}/"
+darkSkyUrlFin.add(fmt"{latlong}?units=")
+darkSkyUrlFin.add(fmt"{Wthr.placeUnits}&exclude={Wthr.darkskyExclude}")
+when not defined(release):
+  echo "DEBUG: final DarkSky URL:\n" & darkSkyUrlFin & "\n"
+
+
+let rawWeatherData = returnWebSiteData(darkSkyUrlFin, Wthr)
 let weatherJson = returnParsedJson(rawWeatherData)
+extractWeather(weatherJson)
 
 
 # Obtain Geo Location data
 # add addtional call to Google API to grab real place name from long+lat
-let latlong = "latlng=51.419212,-3.291481"
 let apiKey = getEnv("GAPI")
-let geoKey = fmt"&key={apiKey}"
-let GoogleBaseUrl = "https://maps.googleapis.com/maps/api/geocode/json?"
-# contruct final URL to use
-let googlePlaceUrl = fmt"{GoogleBaseUrl}{latlong}&result_type=locality&{geoKey}"
-let rawGeoData = returnWebSiteData(googlePlaceUrl, Wthr)
-let placeJson = returnParsedJson(rawGeoData)
-Wthr.placeName = returnPlace(placeJson)
+if apiKey != "":
+  Wthr.googleKey = apiKey
 
-# get values needed from weather forecast JSON data:
-Wthr.timezone = weatherJson{"timezone"}.getStr("no data")
-Wthr.longitude = weatherJson{"longitude"}.getFloat(0.0)
-Wthr.latitude = weatherJson{"latitude"}.getFloat(0.0)
-Wthr.forecastTime = fromUnix(weatherJson{"currently"}{"time"}.getInt(0))
-#Wthr.forecastTime = weatherJson{"currently"}{"time"}.getInt(0)
-Wthr.summary = weatherJson{"currently"}{"summary"}.getStr("no data")
-Wthr.windspeed = weatherJson{"currently"}{"windSpeed"}.getFloat(0.0)
-Wthr.temperature = weatherJson{"currently"}{"temperature"}.getFloat(0.0)
-Wthr.feelsLikeTemp = weatherJson{"currently"}{"apparentTemperature"}.getFloat(0.0)
-Wthr.uvIndex = weatherJson{"currently"}{"uvIndex"}.getInt(0)
-Wthr.daysOutlook = weatherJson["daily"]["summary"].getStr("no data")
+# TODO: request google api key from user
+# https://maps.googleapis.com/maps/api/geocode/json?latlng=51.419212,-3.291481&result_type=locality&key=AIzaSyBdOi6vBsxjmk1d94LHQjPgEPL0zM5trVY
+
+# only look up place if 'Wthr.googleKey' exists:
+if Wthr.googleKey != "":
+  var googlePlaceUrl: string
+  googlePlaceUrl = fmt"{Wthr.googleUrl}latlng={latlong}"
+  googlePlaceUrl.add(fmt"&result_type=locality&key={apiKey}")
+  when not defined(release):
+    echo "DEBUG: final Google Place URL:\n" & googlePlaceUrl & "\n"
+
+  let rawGeoData = returnWebSiteData(googlePlaceUrl, Wthr)
+  let placeJson = returnParsedJson(rawGeoData)
+  extractPlace(placeJson)
+else:
+  when not defined(release):
+    echo "DEBUG: skipping Google Place look up as no API key exists"
 
 # obtain variables with better formating for output
-Wthr.timeFormated = $local(Wthr.forecastTime)
+#Wthr.timeFormated = $local(Wthr.forecastTime)
 #Wthr.timeFormated = format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
+Wthr.timeFormated = repr Wthr.forecastTime
+#Wthr.timeFormated = format(Wthr.forecastTime, "dddd dd MMM yyyy '@' hh:mm tt")
 #echo format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
+
 
 # run proc to output all collated weather information
 showWeather()
