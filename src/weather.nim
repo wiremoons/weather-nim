@@ -375,7 +375,7 @@ if apiKey != "":
   Wthr.googleKey = apiKey
 
 # TODO: request google api key from user
-# https://maps.googleapis.com/maps/api/geocode/json?latlng=51.419212,-3.291481&result_type=locality&key=AIzaSyBdOi6vBsxjmk1d94LHQjPgEPL0zM5trVY
+# https://maps.googleapis.com/maps/api/geocode/json?latlng=51.419212,-3.291481&result_type=locality&key=<add_here>
 
 # only look up place if 'Wthr.googleKey' exists:
 if Wthr.googleKey != "":
