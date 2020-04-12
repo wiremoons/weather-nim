@@ -28,7 +28,7 @@
 #
 
 # import required Nim standard libraries
-import httpclient, asyncdispatch, json, times, strformat, strutils
+import times, strformat, strutils
 
 # object to hold all weather related data needed
 type
@@ -113,9 +113,6 @@ if getEnv("GAPI").len > 0:
 
 when not defined(release):
   echo fmt"DEBUG: Any stored Google API is: '{Wthr.googleKey}'"
-
-# TODO: request google api key from user
-# https://maps.googleapis.com/maps/api/geocode/json?latlng=51.419212,-3.291481&result_type=locality&key=<add_here>
 
 # only look up place if 'Wthr.googleKey' exists:
 if Wthr.googleKey.len > 0:
