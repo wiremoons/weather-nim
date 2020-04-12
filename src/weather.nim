@@ -431,7 +431,7 @@ else:
 # obtain variables with better formating for output
 #Wthr.timeFormated = $local(Wthr.forecastTime)
 #Wthr.timeFormated = format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
-Wthr.timeFormated = repr Wthr.forecastTime
+Wthr.timeFormated = Wthr.forecastTime
 #Wthr.timeFormated = format(Wthr.forecastTime, "dddd dd MMM yyyy '@' hh:mm tt")
 #echo format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
 
