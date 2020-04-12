@@ -1,17 +1,51 @@
 # weather-nim
-Command line application to obtain current weather forecast from DarkSky.  
+Command line application to obtain current weather forecast from DarkSky.
 
 
 ## Application Usage
 
-Below are screen captures of a current weather forecast obtained by running the application:
+Below is screen capture of a current weather forecast obtained by running 
+the application as of version '0.5.4':
+```
 
-**ADD MORE INFO HERE**
+                            WEATHER  FORECAST
 
+ » Weather timezone     : Europe/London
+ » Weather place name   : Barry, UK
+ » Latitide & longitude : 51.419212, -3.291481
+
+∞∞ Forecast ∞∞
+
+ » Forecast Date        : 2020-04-12T15:50:03+01:00
+
+ » Weather Currenty:
+     Summary      : 'Overcast'
+     Windspeed    : 5.4 mph
+     Temperature  : 17.6°C feels like: 17.6°C
+     UV Index     : 2
+
+ » General Outlook:
+     Summary      : 'Possible light rain on Friday.'
+
+ » Weather Alerts:
+     Total Issued : '1'
+
+     Alert Summary : 'Yellow Thunderstorms Warning For United Kingdom - Wales'
+     Alert region  : 'Wales' with severity of 'warning'.
+     Alert starts  : 2020-04-12T16:00:00+01:00 and ends: 2020-04-13T01:00:00+01:00.
+     Description   : Thunderstorms may cause flooding and power cuts in a few places.
+     More details  : http://meteoalarm.eu/en_UK/0/0/UK016.html
+
+Weather forecast data: Powered by Dark Sky™
+Visit: https://darksky.net/poweredby/
+Daily Dark Sky API calls made: 36
+
+All is well.
+```
 
 ## Developement Information
 
-The application in written using the Nim programming langauge, so can be used on supported operating systems such as Windows, Linix, FreeBSD, etc. More information about Nim is available here:
+The application in written using the Nim programming langauge, so can be used on a;; supported operating systems such as Windows, Linix, FreeBSD, etc. More information about Nim is available here:
 
  - [Nim's web site](https://nim-lang.org/)
  - [Nim on GitHub](https://github.com/nim-lang/Nim)
