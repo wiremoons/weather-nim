@@ -8,7 +8,7 @@
 ## Weather forecast retrieval tool that uses the DarkSky API and weather data
 ##
 ## MIT License
-## Copyright (c) 2019 Simon Rowe
+## Copyright (c) 2020 Simon Rowe
 ##
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -206,7 +206,7 @@ proc setConfigFile(): string =
     createDir(confFile)
 
   # add file name to path
-  confFile = confFile & "/settings.ini"
+  confFile = joinPath(confFile,"settings.ini")
   confFile
 
 proc createDefaultSettings() =
@@ -301,7 +301,7 @@ proc putSettings() =
 
   if not existsFile(confFile):
     when not defined(release):
-      echo fmt"DEBUG: Missing config file: '{confFile}'... creating new"
+      echo fmt"DEBUG: *Error* config file: '{confFile}'... missing in proc 'put\Settings()'"
 
   var dict = newConfig()
   dict.setSectionKey("User-Loc", "placeName", Wthr.placeName)
@@ -317,7 +317,7 @@ proc putSettings() =
   dict.writeConfig(confFile)
 
   when not defined(release):
-    echo fmt"DEBUG: Created new config file: '{confFile}'"
+    echo fmt"DEBUG: wrote out config file: '{confFile}'"
 
 
 # include source code here from other supporting files:
@@ -402,3 +402,4 @@ Wthr.timeFormated = repr Wthr.forecastTime
 
 # run proc to output all collated weather information
 showWeather()
+putSettings()
