@@ -28,7 +28,7 @@
 #
 
 # import required Nim standard libraries
-import httpclient, asyncdispatch, json, times, strformat, os, parsecfg
+import httpclient, asyncdispatch, json, times, strformat, os, parsecfg, strutils
 
 # object to hold all weather related data needed
 type
@@ -55,6 +55,8 @@ type
     darkskyExclude: string
     googleUrl: string
     googleKey: string
+    alertTotal: int
+    alertsDump: string
 
 var Wthr = WeatherObj()
 
@@ -114,13 +116,12 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
 proc extractWeather(jsonDataWeather: JsonNode) =
   ##
   ## PROCEDURE: extractWeather
-  ## Input: JsonNode (from Google Places API site)
-  ## Returns: outputs the place name found in the JSON node provided.
-  ## Description: use the JSON object to obtain place name. Use a structure to
-  ## hold unmarshaled data, before the place name is extracted
-  ##
-
-  # structure to hold unmarshaled data (created using 'nimjson' tool)
+  ## Input: JsonNode (from DarkSky site)
+  ## Returns: nothing.
+  ## Description: use the weather JSON object to extract all the 
+  ## weather content needed into the local structure 'WeatherForecast'.
+  ## The unmarshaled data is then placed in the global 'Wthr' structure.
+  # Structure to hold unmarshaled data created using 'nimjson' tool.
   type
     WeatherForecast = ref object
       latitude: float64
@@ -128,6 +129,7 @@ proc extractWeather(jsonDataWeather: JsonNode) =
       timezone: string
       currently: Currently
       daily: Daily
+      alerts: seq[Alerts]
     Currently = ref object
       time: int64
       summary: string
@@ -139,6 +141,14 @@ proc extractWeather(jsonDataWeather: JsonNode) =
     Daily = ref object
       summary: string
       icon: string
+    Alerts = ref object
+        title: string
+        regions: seq[string]
+        severity: string
+        time: int64
+        expires: int64
+        description: string
+        uri: string
 
   # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
   let weather: WeatherForecast = to(jsonDataWeather, WeatherForecast)
@@ -155,6 +165,33 @@ proc extractWeather(jsonDataWeather: JsonNode) =
   Wthr.feelsLikeTemp = weather.currently.apparentTemperature
   Wthr.uvIndex = weather.currently.uvIndex
   Wthr.daysOutlook = weather.daily.summary
+  Wthr.alertTotal = weather.alerts.len
+  # Weather Alerts extraction - only if any exist: 
+  when not defined(release):
+    echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
+
+  if weather.alerts.len > 0:
+    var alertRegions:string
+    # for each weather alert found extract into a formated string
+    # for displayed as a formated block in the final 'weatherOutput.nim'
+    for item in weather.alerts:
+      # regions are stored in a seq - so obtian all first
+      for regionitem in item.regions:
+        alertRegions.add(regionitem)
+
+      # remove any newlines
+      stripLineEnd(item.description)
+      # build this formated text block for each alert:
+      Wthr.alertsDump.add(fmt"""
+     Alert Summary : '{item.title}'
+     Alert region  : '{alertRegions}' with severity of '{item.severity}'.
+     Alert starts  : {$fromUnix(item.time)} and ends: {$fromUnix(item.expires)}.
+     Description   : {item.description}
+     More details  : {item.uri}""")  
+  # no weather alerts found 
+  else:
+    Wthr.alertsDump.add("")
+
 
 proc extractPlace(jsonDataPlace: JsonNode) =
   ##
@@ -346,12 +383,11 @@ if paramCount() > 0:
     echo "Unknown command line parameter given - see options below:"
     showHelp()
 
-# get setting if exist - if not create them...
+# get settings if exist - if not create them wiht default version...
 while not getSettings():
   createDefaultSettings()
 
-
-# create combined latitude and longitude variable for Urls:
+# create combined latitude and longitude into one variable for Urls:
 let latlong = fmt"{Wthr.latConfig},{Wthr.lonConfig}"
 
 # contruct DarkSky URL from settings:
@@ -362,26 +398,26 @@ darkSkyUrlFin.add(fmt"{Wthr.placeUnits}&exclude={Wthr.darkskyExclude}")
 when not defined(release):
   echo "DEBUG: final DarkSky URL:\n" & darkSkyUrlFin & "\n"
 
-
 let rawWeatherData = returnWebSiteData(darkSkyUrlFin, Wthr)
 let weatherJson = returnParsedJson(rawWeatherData)
 extractWeather(weatherJson)
 
-
 # Obtain Geo Location data
-# add addtional call to Google API to grab real place name from long+lat
-let apiKey = getEnv("GAPI")
-if apiKey != "":
-  Wthr.googleKey = apiKey
+# Provide a Google API from env variable 'GAPI' of set:
+if getEnv("GAPI").len > 0:
+  Wthr.googleKey = getEnv("GAPI")
+
+when not defined(release):
+  echo fmt"DEBUG: Any stored Google API is: '{Wthr.googleKey}'"
 
 # TODO: request google api key from user
 # https://maps.googleapis.com/maps/api/geocode/json?latlng=51.419212,-3.291481&result_type=locality&key=<add_here>
 
 # only look up place if 'Wthr.googleKey' exists:
-if Wthr.googleKey != "":
+if Wthr.googleKey.len > 0:
   var googlePlaceUrl: string
   googlePlaceUrl = fmt"{Wthr.googleUrl}latlng={latlong}"
-  googlePlaceUrl.add(fmt"&result_type=locality&key={apiKey}")
+  googlePlaceUrl.add(fmt"&result_type=locality&key={Wthr.googleKey}")
   when not defined(release):
     echo "DEBUG: final Google Place URL:\n" & googlePlaceUrl & "\n"
 

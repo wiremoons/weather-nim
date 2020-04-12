@@ -48,16 +48,18 @@ proc showWeather() =
  » Forecast Date        : {Wthr.timeFormated}
 
  » Weather Currenty:
-     Summary     : '{Wthr.summary}'
-     Windspeed   : {Wthr.windspeed:3.1f} mph
-     Temperature : {Wthr.temperature:3.1f}°C feels like: {Wthr.feelsLikeTemp:3.1f}°C
-     UV Index    : {Wthr.uvIndex}
+     Summary      : '{Wthr.summary}'
+     Windspeed    : {Wthr.windspeed:3.1f} mph
+     Temperature  : {Wthr.temperature:3.1f}°C feels like: {Wthr.feelsLikeTemp:3.1f}°C
+     UV Index     : {Wthr.uvIndex}
 
  » General Outlook:
-     Summary     : '{Wthr.daysOutlook}'
+     Summary      : '{Wthr.daysOutlook}'
 
- » Alerts:
-     Status      : TODO
+ » Weather Alerts:
+     Total Issued : '{Wthr.alertTotal}'
+     
+{Wthr.alertsDump}
 
 Weather forecast data: Powered by Dark Sky™
 Visit: https://darksky.net/poweredby/
