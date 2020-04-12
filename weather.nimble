@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.5.3"
+version       = "0.5.4"
 author        = "Simon Rowe"
 description   = "Command line tool to retrieve the current weather forecast from DarkSky"
 license       = "MIT"

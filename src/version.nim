@@ -44,7 +44,7 @@ proc showVersion() =
 
   echo fmt"""
 
-'{paramStr(0)}' is version: '0.5.3' running on '{hostOS}' ({hostCPU}).
+'{paramStr(0)}' is version: '0.5.4' running on '{hostOS}' ({hostCPU}).
 Copyright (c) 2020 Simon Rowe.
 
 Compiled on: {CompileDate} @ {CompileTime}.
