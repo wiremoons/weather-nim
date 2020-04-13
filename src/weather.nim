@@ -28,7 +28,7 @@
 #
 
 # import required Nim standard libraries
-import times, strformat, strutils
+import times, strformat, strutils, httpclient, asyncdispatch, json
 
 # object to hold all weather related data needed
 type
