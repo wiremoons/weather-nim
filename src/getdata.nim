@@ -24,7 +24,7 @@
 # IN THE SOFTWARE.
 #
 
-import httpclient, asyncdispatch, json, times, strformat, strutils
+import httpclient, asyncdispatch, json, times, strformat, strutils, options
 
 proc returnWebSiteData(webUrl: string, Wthr: var WeatherObj): string =
   ##
@@ -89,19 +89,19 @@ proc extractWeather(jsonDataWeather: JsonNode) =
   # Structure to hold unmarshaled data created using 'nimjson' tool.
   type
     WeatherForecast = ref object
-      latitude: float64
-      longitude: float64
+      latitude: float
+      longitude: float
       timezone: string
       currently: Currently
       daily: Daily
-      alerts: seq[Alerts]
+      alerts: Option[seq[Alerts]]
     Currently = ref object
       time: int64
       summary: string
       icon: string
-      temperature: float64
-      apparentTemperature: float64
-      windSpeed: float64
+      temperature: float
+      apparentTemperature: float
+      windSpeed: float
       uvIndex: int64
     Daily = ref object
       summary: string
@@ -118,29 +118,35 @@ proc extractWeather(jsonDataWeather: JsonNode) =
   # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
   when not defined(release):
     echo fmt"DEBUG: unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
+  
   var weather: WeatherForecast
+  
   try:
     weather = to(jsonDataWeather, WeatherForecast)
   except KeyError:
-    echo "KeyError found!"
+    echo "ERROR: JSON unmarshal 'KeyError' encountered with JSON unmarshal"
     if getCurrentExceptionMsg() == "key not found: .alerts":
-      echo "Error is due to missing alerts seq in JSON data"
+      echo "Error is due to optional missing 'Alerts' seq in JSON data"
       discard
   except:
     let e = getCurrentException() 
     let msg = getCurrentExceptionMsg()
-    echo "Got exception ", repr(e), " with message ", msg
+    echo fmt"ERROR: Got JSON unmarshal exception: '{repr(e)}' with message: {msg}"
+    discard
 
   # get values needed from weather forecast JSON data:
   when not defined(release):
-    echo fmt"DEBUG: unmarshall complete: data extract to 'WeatherForecast' struct"
-    # below outputs 'nil' as unmarshall above failed...
-    echo repr weather
+    echo fmt"DEBUG: JSON unmarshall process completed"
+    # below outputs all data or 'nil' if unmarshall above fails...
+    # TODO: add debug option to dump data to file?
+    #echo repr weather
 
+  # ensure unmarshall worked and data was extracted ok...
   if isNil weather:
     echo "FATAL ERROR: unmarshall of JSON weather provided no data"
     quit 3
 
+  # TODO: add check to these to ensure a default value is used if missing?
   Wthr.timezone = weather.timezone
   Wthr.longitude = weather.longitude
   Wthr.latitude = weather.latitude
@@ -154,35 +160,44 @@ proc extractWeather(jsonDataWeather: JsonNode) =
   Wthr.daysOutlook = weather.daily.summary
 
   when not defined(release):
-    echo fmt"DEBUG: starting 'Alerts' data extract to 'WeatherForecast' struct"
+    echo fmt"DEBUG: starting optional 'Alerts' data extraction..."
 
-  # Weather Alerts extraction - only if any exist: 
-  if weather.alerts.len > 0:
+  if weather.alerts.isSome():
     when not defined(release):
-      echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
-    Wthr.alertTotal = weather.alerts.len
-    var alertRegions:string
-    # for each weather alert found extract into a formated string
-    # for displayed as a formated block in the final 'weatherOutput.nim'
-    for item in weather.alerts:
-      # regions are stored in a seq - so obtian all first
-      for regionitem in item.regions:
-        alertRegions.add(regionitem)
+      echo fmt"DEBUG: optional weather 'Alerts' data available... extracting"
+    
+    let newAlertsSeq = weather.alerts.get
+    echo "Alerts Sequenece is:",repr(newAlertsSeq)
+    # Weather Alerts extraction - only if any exist: 
+    # if weather.alerts.len > 0:
+    #   when not defined(release):
+    #     echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
+    #   Wthr.alertTotal = weather.alerts.len
+    #   var alertRegions:string
+    #   # for each weather alert found extract into a formated string
+    #   # for displayed as a formated block in the final 'weatherOutput.nim'
+    #   for item in weather.alerts:
+    #     # regions are stored in a seq - so obtian all first
+    #     for regionitem in item.regions:
+    #       alertRegions.add(regionitem)
 
-      # remove any newlines
-      stripLineEnd(item.description)
-      # build this formated text block for each alert:
-      Wthr.alertsDump.add(fmt"""
-     Alert Summary : '{item.title}'
-     Alert region  : '{alertRegions}' with severity of '{item.severity}'.
-     Alert starts  : {$fromUnix(item.time)} and ends: {$fromUnix(item.expires)}.
-     Description   : {item.description}
-     More details  : {item.uri}""")  
-  # no weather alerts found 
+    #     # remove any newlines
+    #     stripLineEnd(item.description)
+    #     # build this formated text block for each alert:
+    #     Wthr.alertsDump.add(fmt"""
+    #   Alert Summary : '{item.title}'
+    #   Alert region  : '{alertRegions}' with severity of '{item.severity}'.
+    #   Alert starts  : {$fromUnix(item.time)} and ends: {$fromUnix(item.expires)}.
+    #   Description   : {item.description}
+    #   More details  : {item.uri}""")  
+    # # no weather alerts found 
+    # else:
+    #   echo "No alerts found"
+    #   Wthr.alertTotal = 0
+    #   Wthr.alertsDump.add("")
   else:
-    Wthr.alertTotal = 0
-    Wthr.alertsDump.add("")
-
+    when not defined(release):
+      echo fmt"DEBUG: No weather 'alerts' data identified"
 
 proc extractPlace(jsonDataPlace: JsonNode) =
   ##
