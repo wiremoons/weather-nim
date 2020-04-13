@@ -35,7 +35,9 @@ type
   WeatherObj = object
     timezone: string
     longitude: float
+    lonBearing: string
     latitude: float
+    latBearing: string
     forecastTime: string
     summary: string
     windspeed: float
@@ -129,7 +131,9 @@ else:
   when not defined(release):
     echo "DEBUG: skipping Google Place look up as no API key exists"
 
-# obtain variables with better formating for output
+# obtain variables with better formating or additional infor for output
+if Wthr.latitude < 0: Wthr.latBearing = "°S" else: Wthr.latBearing = "°N"
+if Wthr.longitude < 0: Wthr.lonBearing = "°W" else: Wthr.lonBearing = "°E"
 #Wthr.timeFormated = $local(Wthr.forecastTime)
 #Wthr.timeFormated = format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
 Wthr.timeFormated = Wthr.forecastTime

@@ -41,7 +41,7 @@ proc showWeather() =
 
  » Weather timezone     : {Wthr.timezone}
  » Weather place name   : {Wthr.placeName}
- » Latitide & longitude : {Wthr.latitude}, {Wthr.longitude}
+ » Latitide & longitude : {Wthr.latitude} {Wthr.latBearing}, {Wthr.longitude} {Wthr.lonBearing}
 
 ∞∞ Forecast ∞∞
 
