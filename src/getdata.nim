@@ -116,9 +116,31 @@ proc extractWeather(jsonDataWeather: JsonNode) =
         uri: string
 
   # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
-  let weather: WeatherForecast = to(jsonDataWeather, WeatherForecast)
+  when not defined(release):
+    echo fmt"DEBUG: unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
+  var weather: WeatherForecast
+  try:
+    weather = to(jsonDataWeather, WeatherForecast)
+  except KeyError:
+    echo "KeyError found!"
+    if getCurrentExceptionMsg() == "key not found: .alerts":
+      echo "Error is due to missing alerts seq in JSON data"
+      discard
+  except:
+    let e = getCurrentException() 
+    let msg = getCurrentExceptionMsg()
+    echo "Got exception ", repr(e), " with message ", msg
 
   # get values needed from weather forecast JSON data:
+  when not defined(release):
+    echo fmt"DEBUG: unmarshall complete: data extract to 'WeatherForecast' struct"
+    # below outputs 'nil' as unmarshall above failed...
+    echo repr weather
+
+  if isNil weather:
+    echo "FATAL ERROR: unmarshall of JSON weather provided no data"
+    quit 3
+
   Wthr.timezone = weather.timezone
   Wthr.longitude = weather.longitude
   Wthr.latitude = weather.latitude
@@ -130,12 +152,15 @@ proc extractWeather(jsonDataWeather: JsonNode) =
   Wthr.feelsLikeTemp = weather.currently.apparentTemperature
   Wthr.uvIndex = weather.currently.uvIndex
   Wthr.daysOutlook = weather.daily.summary
-  Wthr.alertTotal = weather.alerts.len
-  # Weather Alerts extraction - only if any exist: 
-  when not defined(release):
-    echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
 
+  when not defined(release):
+    echo fmt"DEBUG: starting 'Alerts' data extract to 'WeatherForecast' struct"
+
+  # Weather Alerts extraction - only if any exist: 
   if weather.alerts.len > 0:
+    when not defined(release):
+      echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
+    Wthr.alertTotal = weather.alerts.len
     var alertRegions:string
     # for each weather alert found extract into a formated string
     # for displayed as a formated block in the final 'weatherOutput.nim'
@@ -155,6 +180,7 @@ proc extractWeather(jsonDataWeather: JsonNode) =
      More details  : {item.uri}""")  
   # no weather alerts found 
   else:
+    Wthr.alertTotal = 0
     Wthr.alertsDump.add("")
 
 
