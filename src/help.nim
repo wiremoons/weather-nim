@@ -29,7 +29,7 @@
 
 import strformat, os
 
-proc showHelp() =
+proc showHelp*() =
   ##
   ## PROCEDURE: showHelp
   ## Input: none required

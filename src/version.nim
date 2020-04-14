@@ -29,7 +29,7 @@
 
 import strformat, os
 
-proc showVersion() =
+proc showVersion*() =
   ##
   ## PROCEDURE: showVersion
   ## Input: none required
@@ -37,10 +37,8 @@ proc showVersion() =
   ## Description: display the app version, build kind, build date, compiler
   ## version, plus license information sources.
   ##
-  when not defined(release):
-    let buildV = fmt"Build is: 'debug' using Nim compiler version: {NimVersion}"
-  else:
-    let buildV = fmt"Build is: 'release' using Nim compiler version: {NimVersion}"
+  const ver = when defined(release): "release" else: "debug"
+  const buildV = fmt"Build is: {ver} using Nim compiler version: {NimVersion}"
 
   echo fmt"""
 

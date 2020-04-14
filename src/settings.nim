@@ -26,18 +26,19 @@
 
 import os, parsecfg, strformat
 
-proc setConfigFile(): string =
+import types, utils
+
+proc setConfigFile*(): string =
   ##
   ## PROCEDURE: setConfigFile
   ## Input: none required
   ## Returns: the path and filename for the programs settings file
   ## Description: return a suitable name a path to the settings file
   ##
-  var confFile: string = getConfigDir() & "weatherApp"
+  var confFile = getConfigDir() & "weatherApp"
 
   if not dirExists(confFile):
-    when not defined(release):
-      echo fmt"DEBUG: Config directory missing: '{confFile}'... creating"
+    debug fmt"DEBUG: Config directory missing: '{confFile}'... creating"
     # TODO : capture OSError here wiht try
     createDir(confFile)
 
@@ -45,7 +46,7 @@ proc setConfigFile(): string =
   confFile = joinPath(confFile,"settings.ini")
   confFile
 
-proc createDefaultSettings() =
+proc createDefaultSettings*() =
   ##
   ## PROCEDURE: createDefaultSettings
   ## Input: none required
@@ -53,13 +54,11 @@ proc createDefaultSettings() =
   ## Description: loads the programs settings file
   ##
 
-  let confFileDefault: string = setConfigFile()
+  let confFileDefault = setConfigFile()
 
   if existsFile(confFileDefault):
-
-    when not defined(release):
-      echo fmt"DEBUG: Config file exists: '{confFileDefault}'"
-      echo fmt"DEBUG: Loading setting from: '{confFileDefault}'"
+    debug fmt"DEBUG: Config file exists: '{confFileDefault}'"
+    debug fmt"DEBUG: Loading setting from: '{confFileDefault}'"
 
 
   when not defined(release):
@@ -79,79 +78,72 @@ proc createDefaultSettings() =
   dict.setSectionKey("Weather", "googleKey", "")
   dict.writeConfig(confFileDefault)
 
-  when not defined(release):
-    echo fmt"DEBUG: Created new default config file: '{confFileDefault}'"
+  debug fmt"DEBUG: Created new default config file: '{confFileDefault}'"
 
 
-proc getSettings(): bool =
+proc getSettings*(w: Weather): bool =
   ##
   ## PROCEDURE: getSettings
-  ## Input: none required
+  ## Input: Weather object
   ## Returns: outputs help information to the display then quits the program
   ## Description: loads the programs settings file
   ##
-  let confFile: string = setConfigFile()
+  result = false
+  let confFile = setConfigFile()
 
   if existsFile(confFile):
 
-    when not defined(release):
-      echo fmt"DEBUG: Config file exists: '{confFile}'"
-      echo fmt"DEBUG: Loading setting from: '{confFile}'"
+    debug fmt"DEBUG: Config file exists: '{confFile}'"
+    debug fmt"DEBUG: Loading setting from: '{confFile}'"
 
     var dict = loadConfig(confFile)
-    Wthr.placeName = dict.getSectionValue("User-Loc", "placeName")
-    Wthr.placeCountry = dict.getSectionValue("User-Loc", "placeCountry")
-    Wthr.placeUnits = dict.getSectionValue("User-Loc", "placeUnits")
-    Wthr.latConfig = dict.getSectionValue("User-Loc", "latConfig")
-    Wthr.lonConfig = dict.getSectionValue("User-Loc", "lonConfig")
-    Wthr.darkskyUrl = dict.getSectionValue("Weather", "darkskyUrl")
-    Wthr.darkskyKey = dict.getSectionValue("Weather", "darkskyKey")
-    Wthr.darkskyExclude = dict.getSectionValue("Weather", "darkskyExclude")
-    Wthr.googleUrl = dict.getSectionValue("Weather", "googleUrl")
-    Wthr.googleKey = dict.getSectionValue("Weather", "googleKey")
-
-    when not defined(release):
-      echo fmt"DEBUG: Config file contents: '{confFile}' are:"
-      echo Wthr.placeName & "\n" & Wthr.placeCountry & "\n" & Wthr.placeUnits
-      echo Wthr.latConfig & "\n" & Wthr.lonConfig & "\n" & Wthr.darkskyUrl
-      echo Wthr.darkskyKey & "\n" & Wthr.darkskyExclude
-      echo Wthr.googleUrl & "\n" & Wthr.googleKey
+    w.placeName = dict.getSectionValue("User-Loc", "placeName")
+    w.placeCountry = dict.getSectionValue("User-Loc", "placeCountry")
+    w.placeUnits = dict.getSectionValue("User-Loc", "placeUnits")
+    w.latConfig = dict.getSectionValue("User-Loc", "latConfig")
+    w.lonConfig = dict.getSectionValue("User-Loc", "lonConfig")
+    w.darkskyUrl = dict.getSectionValue("Weather", "darkskyUrl")
+    w.darkskyKey = dict.getSectionValue("Weather", "darkskyKey")
+    w.darkskyExclude = dict.getSectionValue("Weather", "darkskyExclude")
+    w.googleUrl = dict.getSectionValue("Weather", "googleUrl")
+    w.googleKey = dict.getSectionValue("Weather", "googleKey")
+    
+    debug fmt"DEBUG: Config file contents: '{confFile}' are:"
+    debug w.placeName & "\n" & w.placeCountry & "\n" & w.placeUnits
+    debug w.latConfig & "\n" & w.lonConfig & "\n" & w.darkskyUrl
+    debug w.darkskyKey & "\n" & w.darkskyExclude
+    debug w.googleUrl & "\n" & w.googleKey
 
     result = true
 
   else:
-    when not defined(release):
-      echo fmt"DEBUG: Missing config file: '{confFile}'"
-
-    result = false
+    debug fmt"DEBUG: Missing config file: '{confFile}'"
 
 
-proc putSettings() =
+proc putSettings*(w: Weather) =
   ##
   ## PROCEDURE: putSettings
-  ## Input: none required
+  ## Input: Weather object
   ## Returns: none
   ## Description: writes the programs settings file
   ##
-  let confFile: string = setConfigFile()
+  let confFile = setConfigFile()
 
   if not existsFile(confFile):
-    when not defined(release):
-      echo fmt"DEBUG: *Error* config file: '{confFile}'... missing in proc 'put\Settings()'"
+    debug fmt"DEBUG: *Error* config file: '{confFile}'... missing in proc 'put\Settings()'"
 
   var dict = newConfig()
-  dict.setSectionKey("User-Loc", "placeName", Wthr.placeName)
-  dict.setSectionKey("User-Loc", "placeCountry", Wthr.placeCountry)
-  dict.setSectionKey("User-Loc", "placeUnits", Wthr.placeUnits)
-  dict.setSectionKey("User-Loc", "latConfig", Wthr.latConfig)
-  dict.setSectionKey("User-Loc", "lonConfig", Wthr.lonConfig)
-  dict.setSectionKey("Weather", "darkskyUrl", Wthr.darkskyUrl)
-  dict.setSectionKey("Weather", "darkskyKey", Wthr.darkskyKey)
-  dict.setSectionKey("Weather", "darkskyExclude", Wthr.darkskyExclude)
-  dict.setSectionKey("Weather", "googleUrl", Wthr.googleUrl)
-  dict.setSectionKey("Weather", "googleKey", Wthr.googleKey)
+  dict.setSectionKey("User-Loc", "placeName", w.placeName)
+  dict.setSectionKey("User-Loc", "placeCountry", w.placeCountry)
+  dict.setSectionKey("User-Loc", "placeUnits", w.placeUnits)
+  dict.setSectionKey("User-Loc", "latConfig", w.latConfig)
+  dict.setSectionKey("User-Loc", "lonConfig", w.lonConfig)
+  dict.setSectionKey("Weather", "darkskyUrl", w.darkskyUrl)
+  dict.setSectionKey("Weather", "darkskyKey", w.darkskyKey)
+  dict.setSectionKey("Weather", "darkskyExclude", w.darkskyExclude)
+  dict.setSectionKey("Weather", "googleUrl", w.googleUrl)
+  dict.setSectionKey("Weather", "googleKey", w.googleKey)
   dict.writeConfig(confFile)
 
-  when not defined(release):
-    echo fmt"DEBUG: wrote out config file: '{confFile}'"
+  debug fmt"DEBUG: wrote out config file: '{confFile}'"
 

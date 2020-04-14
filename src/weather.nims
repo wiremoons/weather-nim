@@ -1,4 +1,4 @@
 # build with SSL library support
--d: ssl
+switch("define", "ssl")
 # build with the clang compiler (not GCC)
-#cc = clang
+#switch("cc", "clang")

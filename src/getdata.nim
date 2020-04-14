@@ -24,42 +24,38 @@
 # IN THE SOFTWARE.
 #
 
-import httpclient, asyncdispatch, json, times, strformat, strutils, options
+import httpclient, json, times, strformat, strutils, options
 
-proc returnWebSiteData(webUrl: string, Wthr: var WeatherObj): string =
+import types, utils
+
+proc returnWebSiteData*(webUrl: string, w: Weather): string =
   ##
   ## PROCEDURE: returnWebSiteData
   ## Input: final URL for DarkSky site to obtain forecast and WeatherObject
   ## Returns: raw web page body recieved and daily API calls count
   ## Description: open the provided URL returning the web site content received
   ## also extract HTTP header to obtain API calls total. API calls total is
-  ## updated directly into the WeatherObj (Wthr) passed to the proc.
+  ## updated directly into the Weather (w) passed to the proc.
   ##
-  var client = newAsyncHttpClient()
-  let response = waitfor client.get(webUrl)
-  let rawWebData = waitfor response.body
-  let webHeaders = response.headers
+  var client = newHttpClient()
+  defer: client.close()
+  let response = client.get(webUrl)
+  result = response.body
 
   if response.code != Http200:
     stderr.writeLine "\nFATAL ERROR: web site returned unexpected status of: ",
         response.status, "\n"
-    stderr.writeLIne "Data received:\n\n", rawWebData, "\n\n"
-    close(client)
+    stderr.writeLine "Data received:\n\n", result, "\n\n"
     quit 1
 
-  if rawWebData.len == 0:
+  if result.len == 0:
     stderr.writeLine "\nFATAL ERROR: no data received from web site"
-    close(client)
     quit 2
 
-  if webHeaders.hasKey "x-forecast-api-calls":
-    Wthr.dsApiCalls = webHeaders["x-forecast-api-calls"]
+  if response.headers.hasKey "x-forecast-api-calls":
+    w.dsApiCalls = response.headers["x-forecast-api-calls"]
 
-  close(client)
-  result = rawWebData
-
-
-proc returnParsedJson(rawJsonData: string): JsonNode =
+proc returnParsedJson*(rawJsonData: string): JsonNode =
   ##
   ## PROCEDURE: returnParsedJson
   ## Input: raw web page body containing JSON data from DarkSky web site
@@ -68,8 +64,7 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
   ## it into a JSON node object. If fails then raise an exception.
   ##
   try:
-    var parsedJson = parseJson(rawJsonData)
-    result = parsedJson
+    result = parseJson(rawJsonData)
   except JsonParsingError:
     let
       e = getCurrentException()
@@ -78,14 +73,14 @@ proc returnParsedJson(rawJsonData: string): JsonNode =
   except:
     echo "Unknown exception error when parsing JSON!"
 
-proc extractWeather(jsonDataWeather: JsonNode) =
+proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
   ##
   ## PROCEDURE: extractWeather
-  ## Input: JsonNode (from DarkSky site)
+  ## Input: Weather object, JsonNode (from DarkSky site)
   ## Returns: nothing.
   ## Description: use the weather JSON object to extract all the 
   ## weather content needed into the local structure 'WeatherForecast'.
-  ## The unmarshaled data is then placed in the global 'Wthr' structure.
+  ## The unmarshaled data is then placed in the 'w' object.
   # Structure to hold unmarshaled data created using 'nimjson' tool.
   type
     WeatherForecast = ref object
@@ -107,27 +102,19 @@ proc extractWeather(jsonDataWeather: JsonNode) =
       summary: string
       icon: string
     Alerts = ref object
-        title: string
-        regions: seq[string]
-        severity: string
-        time: int64
-        expires: int64
-        description: string
-        uri: string
+      title: string
+      regions: seq[string]
+      severity: string
+      time: int64
+      expires: int64
+      description: string
+      uri: string
 
   # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
-  when not defined(release):
-    echo fmt"DEBUG: unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
-  
+  debug fmt"DEBUG: unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
   var weather: WeatherForecast
-  
   try:
     weather = to(jsonDataWeather, WeatherForecast)
-  except KeyError:
-    echo "ERROR: JSON unmarshal 'KeyError' encountered with JSON unmarshal"
-    if getCurrentExceptionMsg() == "key not found: .alerts":
-      echo "Error is due to optional missing 'Alerts' seq in JSON data"
-      discard
   except:
     let e = getCurrentException() 
     let msg = getCurrentExceptionMsg()
@@ -135,11 +122,10 @@ proc extractWeather(jsonDataWeather: JsonNode) =
     discard
 
   # get values needed from weather forecast JSON data:
-  when not defined(release):
-    echo fmt"DEBUG: JSON unmarshall process completed"
-    # below outputs all data or 'nil' if unmarshall above fails...
-    # TODO: add debug option to dump data to file?
-    #echo repr weather
+  debug fmt"DEBUG: JSON unmarshall process completed"
+  # below outputs all data or 'nil' if unmarshall above fails...
+  # TODO: add debug option to dump data to file?
+  #echo repr weather
 
   # ensure unmarshall worked and data was extracted ok...
   if isNil weather:
@@ -147,27 +133,25 @@ proc extractWeather(jsonDataWeather: JsonNode) =
     quit 3
 
   # TODO: add check to these to ensure a default value is used if missing?
-  Wthr.timezone = weather.timezone
-  Wthr.longitude = weather.longitude
-  Wthr.latitude = weather.latitude
+  w.timezone = weather.timezone
+  w.longitude = weather.longitude
+  w.latitude = weather.latitude
   #Wthr.forecastTime = weather.currently.time
-  Wthr.forecastTime = $fromUnix(weather.currently.time)
-  Wthr.summary = weather.currently.summary
-  Wthr.windspeed = weather.currently.windSpeed
-  Wthr.temperature = weather.currently.temperature
-  Wthr.feelsLikeTemp = weather.currently.apparentTemperature
-  Wthr.uvIndex = weather.currently.uvIndex
-  Wthr.daysOutlook = weather.daily.summary
+  w.forecastTime = $fromUnix(weather.currently.time)
+  w.summary = weather.currently.summary
+  w.windspeed = weather.currently.windSpeed
+  w.temperature = weather.currently.temperature
+  w.feelsLikeTemp = weather.currently.apparentTemperature
+  w.uvIndex = weather.currently.uvIndex
+  w.daysOutlook = weather.daily.summary
 
-  when not defined(release):
-    echo fmt"DEBUG: starting optional 'Alerts' data extraction..."
+  debug fmt"DEBUG: starting optional 'Alerts' data extraction..."
 
   if weather.alerts.isSome():
-    when not defined(release):
-      echo fmt"DEBUG: optional weather 'Alerts' data available... extracting"
+    debug fmt"DEBUG: optional weather 'Alerts' data available... extracting"
     
-    let newAlertsSeq = weather.alerts.get
-    echo "Alerts Sequenece is:",repr(newAlertsSeq)
+    let newAlertsSeq = weather.alerts.get()
+    echo "Alerts Sequenece is:", repr(newAlertsSeq)
     # Weather Alerts extraction - only if any exist: 
     # if weather.alerts.len > 0:
     #   when not defined(release):
@@ -196,13 +180,12 @@ proc extractWeather(jsonDataWeather: JsonNode) =
     #   Wthr.alertTotal = 0
     #   Wthr.alertsDump.add("")
   else:
-    when not defined(release):
-      echo fmt"DEBUG: No weather 'alerts' data identified"
+    debug fmt"DEBUG: No weather 'alerts' data identified"
 
-proc extractPlace(jsonDataPlace: JsonNode) =
+proc extractPlace*(w: Weather, jsonDataPlace: JsonNode) =
   ##
   ## PROCEDURE: returnPlace
-  ## Input: JsonNode (from Google Places API site)
+  ## Input: Weather object, JsonNode (from Google Places API site)
   ## Returns: outputs the place name found in the JSON node provided.
   ## Description: use the JSON object to obtain place name. Use a structure to
   ## hold unmarshaled data, before the place name is extracted
@@ -217,18 +200,18 @@ proc extractPlace(jsonDataPlace: JsonNode) =
       formatted_address: string
 
   # unmarshall 'jsonData' to object structure 'GeoPlace'
-  let place: GeoPlace = to(jsonDataPlace, GeoPlace)
+  let place = to(jsonDataPlace, GeoPlace)
 
   # check if web site request was handled - if so extract data neded:
   if place.status == "OK":
     # extract one value 'formatted_address' from 'GeoPlace.Results' seq:
-    for item in place[].results:
-      Wthr.placeName = item[].formatted_address
+    for item in place.results:
+      w.placeName = item.formatted_address
   else:
-    if place[].status == "REQUEST_DENIED":
-      echo fmt"ERROR: proc 'returnPlace' has request status : '{place[].status}'."
+    if place.status == "REQUEST_DENIED":
+      echo fmt"ERROR: proc 'returnPlace' has request status : '{place.status}'."
       echo "Check the Google Places API key is correct and available."
     else:
-      echo fmt"ERROR: proc 'returnPlace' has request status : '{place[].status}'."
+      echo fmt"ERROR: proc 'returnPlace' has request status : '{place.status}'."
     # no place name obtained so return as such
-    Wthr.placeName = "UNKNOWN"
+    w.placeName = "UNKNOWN"
