@@ -62,8 +62,8 @@ let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
 
 # contruct DarkSky URL from settings:
 var darkSkyUrlFin = fmt"{weather.darkskyUrl}{weather.darkskyKey}/"
-darkSkyUrlFin &= fmt"{latlong}?units="
-darkSkyUrlFin &= fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
+darkSkyUrlFin.add fmt"{latlong}?units="
+darkSkyUrlFin.add fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
 debug fmt"DEBUG: final DarkSky URL:\n{darkSkyUrlFin}\n"
 
 let rawWeatherData = returnWebSiteData(darkSkyUrlFin, weather)
@@ -79,7 +79,7 @@ debug fmt"DEBUG: Any stored Google API is: '{weather.googleKey}'"
 # only look up place if 'Wthr.googleKey' exists:
 if weather.googleKey.len > 0:
   var googlePlaceUrl = fmt"{weather.googleUrl}latlng={latlong}"
-  googlePlaceUrl &= fmt"&result_type=locality&key={weather.googleKey}"
+  googlePlaceUrl.add fmt"&result_type=locality&key={weather.googleKey}"
   debug "DEBUG: final Google Place URL:\n" & googlePlaceUrl & "\n"
 
   let rawGeoData = returnWebSiteData(googlePlaceUrl, weather)
