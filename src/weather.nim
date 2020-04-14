@@ -28,46 +28,9 @@
 #
 
 # import required Nim standard libraries
-import times, strformat, strutils, httpclient, asyncdispatch, json
-
-# object to hold all weather related data needed
-type
-  WeatherObj = object
-    timezone: string
-    longitude: float
-    lonBearing: string
-    latitude: float
-    latBearing: string
-    forecastTime: string
-    summary: string
-    windspeed: float
-    temperature: float
-    feelsLikeTemp: float
-    uvIndex: int64
-    daysOutlook: string
-    timeFormated: string #DateTime
-    dsAPICalls: string
-    placeName: string
-    placeCountry: string
-    placeUnits: string
-    latConfig: string
-    lonConfig: string
-    darkskyUrl: string
-    darkskyKey: string
-    darkskyExclude: string
-    googleUrl: string
-    googleKey: string
-    alertTotal: int
-    alertsDump: string
-
-var Wthr = WeatherObj()
-
-# include source code here from other supporting files:
-include getdata
-include settings
-include version
-include help
-include weatherOutput
+import os, strformat
+# import source code from our own files
+import getdata, settings, version, help, weatherOutput, types, utils
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
@@ -77,6 +40,7 @@ include weatherOutput
 # https://forum.nim-lang.org/t/5730
 
 let args = commandLineParams()
+var weather = Weather()
 
 # check if the user wanted any command line options
 if paramCount() > 0:
@@ -90,57 +54,50 @@ if paramCount() > 0:
     showHelp()
 
 # get settings if exist - if not create them wiht default version...
-while not getSettings():
+while not weather.getSettings():
   createDefaultSettings()
 
 # create combined latitude and longitude into one variable for Urls:
-let latlong = fmt"{Wthr.latConfig},{Wthr.lonConfig}"
+let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
 
 # contruct DarkSky URL from settings:
-var darkSkyUrlFin: string
-darkSkyUrlFin = fmt"{Wthr.darkskyUrl}{Wthr.darkskyKey}/"
-darkSkyUrlFin.add(fmt"{latlong}?units=")
-darkSkyUrlFin.add(fmt"{Wthr.placeUnits}&exclude={Wthr.darkskyExclude}")
-when not defined(release):
-  echo "DEBUG: final DarkSky URL:\n" & darkSkyUrlFin & "\n"
+var darkSkyUrlFin = fmt"{weather.darkskyUrl}{weather.darkskyKey}/"
+darkSkyUrlFin &= fmt"{latlong}?units="
+darkSkyUrlFin &= fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
+debug fmt"DEBUG: final DarkSky URL:\n{darkSkyUrlFin}\n"
 
-let rawWeatherData = returnWebSiteData(darkSkyUrlFin, Wthr)
+let rawWeatherData = returnWebSiteData(darkSkyUrlFin, weather)
 let weatherJson = returnParsedJson(rawWeatherData)
-extractWeather(weatherJson)
+weather.extractWeather(weatherJson)
 
 # Obtain Geo Location data
 # Provide a Google API from env variable 'GAPI' of set:
-if getEnv("GAPI").len > 0:
-  Wthr.googleKey = getEnv("GAPI")
+weather.googleKey = getEnv("GAPI", "")
 
-when not defined(release):
-  echo fmt"DEBUG: Any stored Google API is: '{Wthr.googleKey}'"
+debug fmt"DEBUG: Any stored Google API is: '{weather.googleKey}'"
 
 # only look up place if 'Wthr.googleKey' exists:
-if Wthr.googleKey.len > 0:
-  var googlePlaceUrl: string
-  googlePlaceUrl = fmt"{Wthr.googleUrl}latlng={latlong}"
-  googlePlaceUrl.add(fmt"&result_type=locality&key={Wthr.googleKey}")
-  when not defined(release):
-    echo "DEBUG: final Google Place URL:\n" & googlePlaceUrl & "\n"
+if weather.googleKey.len > 0:
+  var googlePlaceUrl = fmt"{weather.googleUrl}latlng={latlong}"
+  googlePlaceUrl &= fmt"&result_type=locality&key={weather.googleKey}"
+  debug "DEBUG: final Google Place URL:\n" & googlePlaceUrl & "\n"
 
-  let rawGeoData = returnWebSiteData(googlePlaceUrl, Wthr)
+  let rawGeoData = returnWebSiteData(googlePlaceUrl, weather)
   let placeJson = returnParsedJson(rawGeoData)
-  extractPlace(placeJson)
+  weather.extractPlace(placeJson)
 else:
-  when not defined(release):
-    echo "DEBUG: skipping Google Place look up as no API key exists"
+  debug "DEBUG: skipping Google Place look up as no API key exists"
 
 # obtain variables with better formating or additional infor for output
-if Wthr.latitude < 0: Wthr.latBearing = "°S" else: Wthr.latBearing = "°N"
-if Wthr.longitude < 0: Wthr.lonBearing = "°W" else: Wthr.lonBearing = "°E"
+weather.latBearing = if weather.latitude < 0: "°S" else: "°N"
+weather.lonBearing = if weather.longitude < 0: "°W" else: "°E"
 #Wthr.timeFormated = $local(Wthr.forecastTime)
 #Wthr.timeFormated = format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
-Wthr.timeFormated = Wthr.forecastTime
+weather.timeFormated = weather.forecastTime
 #Wthr.timeFormated = format(Wthr.forecastTime, "dddd dd MMM yyyy '@' hh:mm tt")
 #echo format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
 
 
 # run proc to output all collated weather information
-showWeather()
-putSettings()
+weather.showWeather()
+weather.putSettings()

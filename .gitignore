@@ -1,8 +1,23 @@
+# https://stackoverflow.com/questions/5711120/gitignore-without-binary-files
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+# Unignore LICENSE
+!LICENSE
+
 # directories to exclude form Git repo
 nimcache/
 nimblecache/
 htmldocs/
 # ensure any binary file are not up loaded
 bin/*
+*.exe
+
 # file containing api keys
 keys.txt

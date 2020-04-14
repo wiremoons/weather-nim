@@ -27,7 +27,9 @@
 
 import strformat
 
-proc showWeather() =
+import types
+
+proc showWeather*(w: Weather) =
   ##
   ## PROCEDURE: showWeather
   ## Input: none required
@@ -39,31 +41,31 @@ proc showWeather() =
 
                             WEATHER  FORECAST
 
- » Weather timezone     : {Wthr.timezone}
- » Weather place name   : {Wthr.placeName}
- » Latitide & longitude : {Wthr.latitude} {Wthr.latBearing}, {Wthr.longitude} {Wthr.lonBearing}
+ » Weather timezone     : {w.timezone}
+ » Weather place name   : {w.placeName}
+ » Latitide & longitude : {w.latitude} {w.latBearing}, {w.longitude} {w.lonBearing}
 
 ∞∞ Forecast ∞∞
 
- » Forecast Date        : {Wthr.timeFormated}
+ » Forecast Date        : {w.timeFormated}
 
  » Weather Currenty:
-     Summary      : '{Wthr.summary}'
-     Windspeed    : {Wthr.windspeed:3.1f} mph
-     Temperature  : {Wthr.temperature:3.1f}°C feels like: {Wthr.feelsLikeTemp:3.1f}°C
-     UV Index     : {Wthr.uvIndex}
+     Summary      : '{w.summary}'
+     Windspeed    : {w.windspeed:3.1f} mph
+     Temperature  : {w.temperature:3.1f}°C feels like: {w.feelsLikeTemp:3.1f}°C
+     UV Index     : {w.uvIndex}
 
  » General Outlook:
-     Summary      : '{Wthr.daysOutlook}'
+     Summary      : '{w.daysOutlook}'
 
  » Weather Alerts:
-     Total Issued : '{Wthr.alertTotal}'
+     Total Issued : '{w.alertTotal}'
      
-{Wthr.alertsDump}
+{w.alertsDump}
 
 Weather forecast data: Powered by Dark Sky™
 Visit: https://darksky.net/poweredby/
-Daily Dark Sky API calls made: {Wthr.dsApiCalls}
+Daily Dark Sky API calls made: {w.dsApiCalls}
 
 All is well.
 """
