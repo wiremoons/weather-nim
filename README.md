@@ -84,7 +84,7 @@ This is my first published [Nim](https://nim-lang.org) program written for fun, 
 A special thank you to [@Yardanico](https://github.com/Yardanico) who very kindly reviewed, improved, and then contributed to my projects code, and also explained why the changes made, were better ways to write Nim code. I certainly learnt a lot from these kind actions!
 
 - @Yardanico : [Nim forum support](https://forum.nim-lang.org/t/6203) and [A lot of (very helpful) changes](https://github.com/wiremoons/weather-nim/commit/752ba977ee7cebf75bfafd54109e89ddd97e2725) to the project code;
-- @Vindaar : Nim Forum support](https://forum.nim-lang.org/t/6182#38156);
+- @Vindaar : [Nim Forum support](https://forum.nim-lang.org/t/6182#38156);
 - @Dawkot : [Nim Forum support](https://forum.nim-lang.org/t/5690#35322).
 
 And of course all the other people who develop and make Nim available for me to use in the first place!
