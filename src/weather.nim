@@ -39,8 +39,11 @@ import getdata, settings, version, help, weatherOutput, types, utils
 # JSON packages parse:
 # https://forum.nim-lang.org/t/5730
 
-let args = commandLineParams()
+# create a new weather object - see 'types.nim'
 var weather = Weather()
+
+
+let args = commandLineParams()
 
 # check if the user wanted any command line options
 if paramCount() > 0:
@@ -53,7 +56,7 @@ if paramCount() > 0:
     echo "Unknown command line parameter given - see options below:"
     showHelp()
 
-# get settings if exist - if not create them wiht default version...
+# get settings if exist - if not create them with default version...
 while not weather.getSettings():
   createDefaultSettings()
 
