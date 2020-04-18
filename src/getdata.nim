@@ -26,7 +26,7 @@
 
 import httpclient, json, times, strformat, strutils, options
 
-import types, utils
+import types, dbgUtils
 
 proc returnWebSiteData*(webUrl: string, w: Weather): string =
   ##
@@ -78,7 +78,7 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
   ## PROCEDURE: extractWeather
   ## Input: Weather object, JsonNode (from DarkSky site)
   ## Returns: nothing.
-  ## Description: use the weather JSON object to extract all the 
+  ## Description: use the weather JSON object to extract all the
   ## weather content needed into the local structure 'WeatherForecast'.
   ## The unmarshaled data is then placed in the 'w' object.
   # Structure to hold unmarshaled data created using 'nimjson' tool.
@@ -111,18 +111,18 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
       uri: string
 
   # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
-  debug fmt"DEBUG: unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
+  debug fmt"unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
   var weather: WeatherForecast
   try:
     weather = to(jsonDataWeather, WeatherForecast)
   except:
-    let e = getCurrentException() 
+    let e = getCurrentException()
     let msg = getCurrentExceptionMsg()
     echo fmt"ERROR: Got JSON unmarshal exception: '{repr(e)}' with message: {msg}"
     discard
 
   # get values needed from weather forecast JSON data:
-  debug fmt"DEBUG: JSON unmarshall process completed"
+  debug fmt"JSON unmarshall process completed"
   # below outputs all data or 'nil' if unmarshall above fails...
   # TODO: add debug option to dump data to file?
   #echo repr weather
@@ -145,14 +145,14 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
   w.uvIndex = weather.currently.uvIndex
   w.daysOutlook = weather.daily.summary
 
-  debug fmt"DEBUG: starting optional 'Alerts' data extraction..."
+  debug fmt"starting optional 'Alerts' data extraction..."
 
   if weather.alerts.isSome():
-    debug fmt"DEBUG: optional weather 'Alerts' data available... extracting"
-    
+    debug fmt"optional weather 'Alerts' data available... extracting"
+
     let newAlertsSeq = weather.alerts.get()
     echo "Alerts Sequenece is:", repr(newAlertsSeq)
-    # Weather Alerts extraction - only if any exist: 
+    # Weather Alerts extraction - only if any exist:
     # if weather.alerts.len > 0:
     #   when not defined(release):
     #     echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
@@ -173,14 +173,14 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
     #   Alert region  : '{alertRegions}' with severity of '{item.severity}'.
     #   Alert starts  : {$fromUnix(item.time)} and ends: {$fromUnix(item.expires)}.
     #   Description   : {item.description}
-    #   More details  : {item.uri}""")  
-    # # no weather alerts found 
+    #   More details  : {item.uri}""")
+    # # no weather alerts found
     # else:
     #   echo "No alerts found"
     #   Wthr.alertTotal = 0
     #   Wthr.alertsDump.add("")
   else:
-    debug fmt"DEBUG: No weather 'alerts' data identified"
+    debug fmt"no weather 'alerts' data identified"
 
 proc extractPlace*(w: Weather, jsonDataPlace: JsonNode) =
   ##

@@ -30,7 +30,7 @@
 # import required Nim standard libraries
 import os, strformat
 # import source code from our own files
-import getdata, settings, version, help, weatherOutput, types, utils
+import getdata, settings, version, help, weatherOutput, types, dbgUtils
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
@@ -67,7 +67,7 @@ let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
 var darkSkyUrlFin = fmt"{weather.darkskyUrl}{weather.darkskyKey}/"
 darkSkyUrlFin.add fmt"{latlong}?units="
 darkSkyUrlFin.add fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
-debug fmt"DEBUG: final DarkSky URL:\n{darkSkyUrlFin}\n"
+debug fmt"final DarkSky URL:\n{darkSkyUrlFin}\n"
 
 let rawWeatherData = returnWebSiteData(darkSkyUrlFin, weather)
 let weatherJson = returnParsedJson(rawWeatherData)
@@ -77,19 +77,19 @@ weather.extractWeather(weatherJson)
 # Provide a Google API from env variable 'GAPI' of set:
 weather.googleKey = getEnv("GAPI", "")
 
-debug fmt"DEBUG: Any stored Google API is: '{weather.googleKey}'"
+debug fmt"Any stored Google API is: '{weather.googleKey}'"
 
 # only look up place if 'Wthr.googleKey' exists:
 if weather.googleKey.len > 0:
   var googlePlaceUrl = fmt"{weather.googleUrl}latlng={latlong}"
   googlePlaceUrl.add fmt"&result_type=locality&key={weather.googleKey}"
-  debug "DEBUG: final Google Place URL:\n" & googlePlaceUrl & "\n"
+  debug "final Google Place URL:\n" & googlePlaceUrl & "\n"
 
   let rawGeoData = returnWebSiteData(googlePlaceUrl, weather)
   let placeJson = returnParsedJson(rawGeoData)
   weather.extractPlace(placeJson)
 else:
-  debug "DEBUG: skipping Google Place look up as no API key exists"
+  debug "skipping Google Place look up as no API key exists"
 
 # obtain variables with better formating or additional infor for output
 weather.latBearing = if weather.latitude < 0: "°S" else: "°N"

@@ -26,7 +26,7 @@
 
 import os, parsecfg, strformat
 
-import types, utils
+import types, dbgUtils
 
 proc setConfigFile*(): string =
   ##
@@ -38,12 +38,12 @@ proc setConfigFile*(): string =
   var confFile = getConfigDir() & "weatherApp"
 
   if not dirExists(confFile):
-    debug fmt"DEBUG: Config directory missing: '{confFile}'... creating"
+    debug fmt"config directory missing: '{confFile}'... creating"
     # TODO : capture OSError here wiht try
     createDir(confFile)
 
   # add file name to path
-  confFile = joinPath(confFile,"settings.ini")
+  confFile = joinPath(confFile, "settings.ini")
   confFile
 
 proc createDefaultSettings*() =
@@ -57,12 +57,12 @@ proc createDefaultSettings*() =
   let confFileDefault = setConfigFile()
 
   if existsFile(confFileDefault):
-    debug fmt"DEBUG: Config file exists: '{confFileDefault}'"
-    debug fmt"DEBUG: Loading setting from: '{confFileDefault}'"
+    debug fmt"config file exists: '{confFileDefault}' - aborting writting default"
+    echo "Warning: attempting to create default settings file when it already exist."
+    echo "located existing seeting file: '{confFileDefault}' - skipping overwrite..."
+    return
 
-
-  when not defined(release):
-    echo fmt"DEBUG: Creating a default config file: '{confFileDefault}'"
+  debug fmt"creating a default config file: '{confFileDefault}'"
 
   # create a defual set of values for initial configuration
   var dict = newConfig()
@@ -78,7 +78,7 @@ proc createDefaultSettings*() =
   dict.setSectionKey("Weather", "googleKey", "")
   dict.writeConfig(confFileDefault)
 
-  debug fmt"DEBUG: Created new default config file: '{confFileDefault}'"
+  debug fmt"created new default config file: '{confFileDefault}'"
 
 
 proc getSettings*(w: Weather): bool =
@@ -93,8 +93,8 @@ proc getSettings*(w: Weather): bool =
 
   if existsFile(confFile):
 
-    debug fmt"DEBUG: Config file exists: '{confFile}'"
-    debug fmt"DEBUG: Loading setting from: '{confFile}'"
+    debug fmt"config file exists: '{confFile}'"
+    debug fmt"loading setting from: '{confFile}'"
 
     var dict = loadConfig(confFile)
     w.placeName = dict.getSectionValue("User-Loc", "placeName")
@@ -107,8 +107,8 @@ proc getSettings*(w: Weather): bool =
     w.darkskyExclude = dict.getSectionValue("Weather", "darkskyExclude")
     w.googleUrl = dict.getSectionValue("Weather", "googleUrl")
     w.googleKey = dict.getSectionValue("Weather", "googleKey")
-    
-    debug fmt"DEBUG: Config file contents: '{confFile}' are:"
+
+    debug fmt"config file contents: '{confFile}' are:"
     debug w.placeName & "\n" & w.placeCountry & "\n" & w.placeUnits
     debug w.latConfig & "\n" & w.lonConfig & "\n" & w.darkskyUrl
     debug w.darkskyKey & "\n" & w.darkskyExclude
@@ -117,7 +117,7 @@ proc getSettings*(w: Weather): bool =
     result = true
 
   else:
-    debug fmt"DEBUG: Missing config file: '{confFile}'"
+    debug fmt"missing config file: '{confFile}'"
 
 
 proc putSettings*(w: Weather) =
@@ -130,7 +130,7 @@ proc putSettings*(w: Weather) =
   let confFile = setConfigFile()
 
   if not existsFile(confFile):
-    debug fmt"DEBUG: *Error* config file: '{confFile}'... missing in proc 'put\Settings()'"
+    debug fmt"*Error* config file: '{confFile}'... missing in proc 'put\Settings()'"
 
   var dict = newConfig()
   dict.setSectionKey("User-Loc", "placeName", w.placeName)
@@ -145,5 +145,5 @@ proc putSettings*(w: Weather) =
   dict.setSectionKey("Weather", "googleKey", w.googleKey)
   dict.writeConfig(confFile)
 
-  debug fmt"DEBUG: wrote out config file: '{confFile}'"
+  debug fmt"wrote out config file: '{confFile}'"
 

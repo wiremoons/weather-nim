@@ -1,12 +1,14 @@
 ## Weather Forecast Retrieval Tool (weather)
 ##
+## SOURCE FILE: dbgUtils.nim
+##
 ## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
 ## Source code available from GitHub: https://github.com/wiremoons/weather.git
 ## 
 ## Weather forecast retrieval tool that uses the DarkSky API and weather data
 ##
 ## MIT License
-## Copyright (c) 2019 Simon Rowe
+## Copyright (c) 2020 Simon Rowe
 ##
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -25,47 +27,7 @@
 # IN THE SOFTWARE.
 #
 
-import strformat
 
-import types
-
-proc showWeather*(w: Weather) =
-  ##
-  ## PROCEDURE: showWeather
-  ## Input: none required
-  ## Returns: outputs the weather forecast data obtainned
-  ## Description: display the weather forecats information
-  ##
-
-  echo fmt"""
-
-                            WEATHER  FORECAST
-
- » Weather timezone     : {w.timezone}
- » Weather place name   : {w.placeName}
- » Latitide & longitude : {w.latitude} {w.latBearing}, {w.longitude} {w.lonBearing}
-
-∞∞ Forecast ∞∞
-
- » Forecast Date        : {w.timeFormated}
-
- » Weather Currenty:
-     Summary      : '{w.summary}'
-     Windspeed    : {w.windspeed:3.1f} mph
-     Temperature  : {w.temperature:3.1f}°C feels like: {w.feelsLikeTemp:3.1f}°C
-     UV Index     : {w.uvIndex}
-
- » General Outlook:
-     Summary      : '{w.daysOutlook}'
-
- » Weather Alerts:
-     Total Issued : '{w.alertTotal}'
-     
-{w.alertsDump}
-
-Weather forecast data: Powered by Dark Sky™
-Visit: https://darksky.net/poweredby/
-Daily Dark Sky API calls made: {w.dsApiCalls}
-
-All is well.
-"""
+template debug*(data: untyped) =
+  when not defined(release):
+    write(stderr, "DEBUG: " & data & ".\n")
