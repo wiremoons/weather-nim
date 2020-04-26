@@ -19,5 +19,8 @@ htmldocs/
 bin/*
 *.exe
 
+# any 'debug.txt' file
+debug.txt
+
 # file containing api keys
 keys.txt
