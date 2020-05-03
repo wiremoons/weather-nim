@@ -55,3 +55,6 @@ For licenses and further information visit:
 All is well.
 """
   quit 0
+
+when isMainModule:
+  showVersion()
