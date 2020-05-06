@@ -16,9 +16,9 @@ the application as of version '0.5.4':
 
 ∞∞ Forecast ∞∞
 
- » Forecast Date        : 2020-04-12T15:50:03+01:00
+ » Forecast Date        : Wed 06 May 2020 21:46:31
 
- » Weather Currenty:
+ » Weather Currently:
      Summary      : 'Overcast'
      Windspeed    : 5.4 mph
      Temperature  : 17.6°C feels like: 17.6°C
