@@ -25,8 +25,9 @@
 # IN THE SOFTWARE.
 #
 
+# import Nim language modules
 import strformat
-
+# import local supporting weather modules
 import types
 
 proc showWeather*(w: Weather) =
@@ -43,7 +44,7 @@ proc showWeather*(w: Weather) =
 
  » Weather timezone     : {w.timezone}
  » Weather place name   : {w.placeName}
- » Latitide & longitude : {w.latitude} {w.latBearing}, {w.longitude} {w.lonBearing}
+ » Latitude & longitude : {w.latitude} {w.latBearing}, {w.longitude} {w.lonBearing}
 
 ∞∞ Forecast ∞∞
 
