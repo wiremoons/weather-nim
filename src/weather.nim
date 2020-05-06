@@ -28,7 +28,7 @@
 #
 
 # import required Nim standard libraries
-import os, strformat
+import os, strformat, times
 # import source code from our own files
 import getdata, settings, version, help, weatherOutput, types, dbgUtils
 
@@ -94,12 +94,8 @@ else:
 # obtain variables with better formating or additional infor for output
 weather.latBearing = if weather.latitude < 0: "°S" else: "°N"
 weather.lonBearing = if weather.longitude < 0: "°W" else: "°E"
-#Wthr.timeFormated = $local(Wthr.forecastTime)
-#Wthr.timeFormated = format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
-weather.timeFormated = weather.forecastTime
-#Wthr.timeFormated = format(Wthr.forecastTime, "dddd dd MMM yyyy '@' hh:mm tt")
-#echo format(Wthr.timeFormated, "dddd dd MMM yyyy '@' hh:mm tt")
-
+# convert int64 with Unix Epoch to formated date time string
+weather.timeFormated = fromUnix(weather.forecastTime).format("ddd dd MMM yyyy HH:mm:ss")
 
 # run proc to output all collated weather information
 weather.showWeather()
