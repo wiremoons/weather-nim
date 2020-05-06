@@ -12,7 +12,7 @@ the application as of version '0.5.4':
 
  » Weather timezone     : Europe/London
  » Weather place name   : Barry, UK
- » Latitide & longitude : 51.419212 °N, -3.291481 °W
+ » Latitude & longitude : 51.419212 °N, -3.291481 °W
 
 ∞∞ Forecast ∞∞
 
@@ -58,8 +58,12 @@ If you wish to build `weather` application yourself, then the instructions below
 
 The instruction below are for Linux, and have been tested on Raspbian '*Buster*' and Ubuntu 20.04.
 
-**ADD MORE INFO HERE**
+To build 'weather' from source on a Linux based system, the following steps can be used:
 
+1. Install the Nim compiler and a C compiler such as gcc or CLang, plus the OpenSSL library. More information on installing Nim can be found here: [Nim Download](https://nim-lang.org/install.html).
+2. Once Nim is installed and workimg on your system, you can clone this GitHub repo with the command: `git clone https://github.com/wiremoons/weather.git`
+3. Then in the cloned code directory for `weather` use Nimble to build a release version with the command: `nimble release`.   Other Nimble build commands can be seen by runing: `nimble tasks`.
+4. The compiled binary of `weather` can now be found in the `./bin` sub directory. Just copy it somewhere in you path, and it should work when run.
 
 
 ### Windows 10
