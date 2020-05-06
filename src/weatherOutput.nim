@@ -50,7 +50,7 @@ proc showWeather*(w: Weather) =
 
  » Forecast Date        : {w.timeFormated}
 
- » Weather Currenty:
+ » Weather Currently:
      Summary      : '{w.summary}'
      Windspeed    : {w.windspeed:3.1f} mph
      Temperature  : {w.temperature:3.1f}°C feels like: {w.feelsLikeTemp:3.1f}°C
