@@ -1,4 +1,4 @@
-# weather-nim
+# weather
 Command line application to obtain current weather forecast from DarkSky.
 
 
@@ -45,18 +45,18 @@ All is well.
 
 ## Development Information
 
-The application in written using the Nim programming language, so can be used on a;; supported operating systems such as Windows, Linux, FreeBSD, etc. More information about Nim is available here:
+The application in written using the Nim programming language, so can be used on any supported operating systems such as Windows, Linux, FreeBSD, etc. More information about Nim is available here:
 
  - [Nim's web site](https://nim-lang.org/)
  - [Nim on GitHub](https://github.com/nim-lang/Nim)
 
 ## Building and Installing from Source 
 
-If you wish to build `weather-nim` application yourself, then the instructions below should help. These cover Windows and Linux specifically, but hopefully they will help for other platforms too.
+If you wish to build `weather` application yourself, then the instructions below should help. These cover Windows and Linux specifically, but hopefully they will help for other platforms too.
 
 ### Linux
 
-The instruction below are for Linux, and have been tested on Raspbian '*Buster*' and Ubuntu 19.10.
+The instruction below are for Linux, and have been tested on Raspbian '*Buster*' and Ubuntu 20.04.
 
 **ADD MORE INFO HERE**
 
@@ -89,8 +89,9 @@ A special thank you to [@Yardanico](https://github.com/Yardanico) who very kindl
 
 And of course all the other people who develop and make Nim available for me to use in the first place!
 
+If you are interested in reading about what I have been programing in Nim, then you can find several Nim related articles on my blog here: [www.wiremoons.com](http://www.wiremoons.com/).
+
 
 ## License
 
 The application is provided under the MIT open source license. A copy of the MIT license file is [here](./LICENSE).
-
