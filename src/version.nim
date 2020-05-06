@@ -39,10 +39,12 @@ proc showVersion*() =
   ##
   const ver = when defined(release): "release" else: "debug"
   const buildV = fmt"Build is: {ver} using Nim compiler version: {NimVersion}"
+  const NimblePkgVersion {.strdefine.} = "Unknown"
+  let appName = extractFilename(getAppFilename())
 
   echo fmt"""
 
-'{paramStr(0)}' is version: '0.5.5' running on '{hostOS}' ({hostCPU}).
+'{appName}' is version: '{NimblePkgVersion}' running on '{hostOS}' ({hostCPU}).
 Copyright (c) 2020 Simon Rowe.
 
 Compiled on: {CompileDate} @ {CompileTime}.
@@ -56,5 +58,6 @@ All is well.
 """
   quit 0
 
+# Allow module to be run standalone for tests
 when isMainModule:
   showVersion()
