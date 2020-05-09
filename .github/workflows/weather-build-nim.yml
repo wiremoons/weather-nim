@@ -22,16 +22,29 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
       
-    # Install Ubuntu OS updates, install dependancies and Nim language
-    - name: Install Dependencies, Updates, and Nim Language
+    # Install Ubuntu OS updates
+    - name: Install OS updates, security fixes etc
       run: |
-        echo "Adding OS updates, dependencies, and installing Nim language"
+        echo "Installing OS updates, security fixes etc"
         sudo apt update
+        sudo apt -y upgrade
         sudo apt -y autoremove
-        sudo apt -y install build-essential openssl nim
+    
+    # Install dependancies and Nim language
+    - name: Install dependencies and Nim language
+      run: |
+        echo "Installing Nim language and dependencies..."
+        sudo apt -y install build-essential openssl git nim
         nim --version
         nimble --version
-        nimble install nimble
+        nimble refresh -y
+
+    # Install latest Nimble version
+    - name: Install dependencies and Nim language
+      run: |
+        echo "Update nimble to current version..."
+        nimble refresh -y
+        nimble install -y nimble
         nimble version
         
     # Runs a set of commands using the runners shell
