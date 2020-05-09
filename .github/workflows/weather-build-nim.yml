@@ -35,9 +35,9 @@ jobs:
         curl https://raw.githubusercontent.com/wiremoons/nim-misc/master/nim-install.sh -o nim-install.sh
         chmod 755 ./nim-install.sh
         ./nim-install.sh
-        nim --version
-        nimble --version
-        nimble refresh -y
+        echo "Installed version of Nim and Nimble are:"
+        $HOME/.nimble/nim/bin/nim --version
+        $HOME/.nimble/bin/nimble --version
 
     # Install latest Nimble version
     #- name: Install dependencies and Nim language
@@ -54,7 +54,10 @@ jobs:
     - name: Run a multi-line script
       run: |
         echo "Building the project..."
-        nimble release
+        pwd
+        ls
+        PATH="${PATH}":$HOME/.nimble/nim/bin:$HOME/.nimble/bin
+        $HOME/.nimble/bin/nimble release
         cd bin/
         ./weather -v
         ./weather
