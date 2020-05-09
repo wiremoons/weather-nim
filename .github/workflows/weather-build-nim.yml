@@ -25,7 +25,7 @@ jobs:
     # Install Ubuntu OS updates, install dependancies and Nim language
     - name: Install Dependencies, Updates, and Nim Language
       run: |
-        echo "Adding OS updates, dependencies, and installing Nim language
+        echo "Adding OS updates, dependencies, and installing Nim language"
         sudo apt update
         sudo apt -y autoremove
         sudo apt -y install build-essential openssl nim
