@@ -32,7 +32,7 @@ jobs:
       run: |
         echo "Installing Nim language and dependencies..."
         sudo apt -y install build-essential openssl git curl
-        curl https://github.com/wiremoons/nim-misc/blob/master/nim-install.sh -o nim-install.sh
+        curl https://raw.githubusercontent.com/wiremoons/nim-misc/master/nim-install.sh -o nim-install.sh
         chmod 755 ./nim-install.sh
         ./nim-install.sh
         nim --version
