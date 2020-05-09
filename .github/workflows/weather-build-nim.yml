@@ -32,20 +32,20 @@ jobs:
       run: |
         echo "Installing Nim language and dependencies..."
         sudo apt -y install build-essential openssl git curl
-        curl https://nim-lang.org/choosenim/init.sh -o choosenim
-        chmod 755 ./choosenim
-        ./choosenim -y
+        curl https://github.com/wiremoons/nim-misc/blob/master/nim-install.sh -o nim-install.sh
+        chmod 755 ./nim-install.sh
+        ./nim-install.sh
         nim --version
         nimble --version
         nimble refresh -y
 
     # Install latest Nimble version
-    - name: Install dependencies and Nim language
-      run: |
-        echo "Update nimble to current version..."
-        nimble refresh -y
-        nimble install -y nimble
-        nimble version
+    #- name: Install dependencies and Nim language
+    #  run: |
+      #  echo "Update nimble to current version..."
+        #nimble refresh -y
+        #nimble install -y nimble
+        #nimble version
         
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
