@@ -16,11 +16,11 @@ requires "nim >= 1.0.2"
 
 task release, "Builds a release version":
   echo("\nRelease Build...\n")
-  exec("nimble build -d:release --passC:-march=native")
+  exec("nimble build -d:release --gc:orc --passC:-march=native")
 
 task debug, "Builds a debug version":
   echo("\nDebug Build\n")
-  exec("nimble build -d:debug --lineDir:on --debuginfo --debugger:native")
+  exec("nimble build --gc:orc -d:debug --lineDir:on --debuginfo --debugger:native")
 
 # pre runner for 'exec' to first carry out a 'debug' task build above
 before exec:
