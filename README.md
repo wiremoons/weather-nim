@@ -1,3 +1,5 @@
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE) ![weather](https://github.com/wiremoons/weather/workflows/weather/badge.svg?branch=master) 
+
 # weather
 Command line application to obtain current weather forecast from DarkSky.
 
