@@ -39,7 +39,7 @@ proc setConfigFile*(): string =
 
   if not dirExists(confFile):
     debug fmt"config directory missing: '{confFile}'... creating"
-    # TODO : capture OSError here wiht try
+    # TODO : capture OSError here with 'try'
     createDir(confFile)
 
   # add file name to path
@@ -50,21 +50,23 @@ proc createDefaultSettings*() =
   ##
   ## PROCEDURE: createDefaultSettings
   ## Input: none required
-  ## Returns: outputs help information to the display then quits the program
-  ## Description: loads the programs settings file
+  ## Returns: nothing
+  ## Description: gets the 'settings.ini' file location and only if this
+  ## file does not exist it creates one with a 'default' set of parameters
+  ## to ensure the program can run, and to return to a default state if needed.
   ##
 
   let confFileDefault = setConfigFile()
 
   if existsFile(confFileDefault):
-    debug fmt"config file exists: '{confFileDefault}' - aborting writting default"
+    debug fmt"config file exists: '{confFileDefault}' - aborting writing a new default"
     echo "Warning: attempting to create default settings file when it already exist."
-    echo "located existing seeting file: '{confFileDefault}' - skipping overwrite..."
+    echo "Existing settings file here: '{confFileDefault}' - skipping overwrite..."
     return
 
   debug fmt"creating a default config file: '{confFileDefault}'"
 
-  # create a defual set of values for initial configuration
+  # create a default set of values for initial configuration
   var dict = newConfig()
   dict.setSectionKey("User-Loc", "placeName", "Barry")
   dict.setSectionKey("User-Loc", "placeCountry", "UK")
@@ -85,16 +87,16 @@ proc getSettings*(w: Weather): bool =
   ##
   ## PROCEDURE: getSettings
   ## Input: Weather object
-  ## Returns: outputs help information to the display then quits the program
-  ## Description: loads the programs settings file
+  ## Returns: Boolean to indicate success or not for settings retrieval
+  ## Description: loads the programs 'settings.ini' file parameters into
+  ## the weather object rady for use by the program.
   ##
   result = false
   let confFile = setConfigFile()
 
   if existsFile(confFile):
-
     debug fmt"config file exists: '{confFile}'"
-    debug fmt"loading setting from: '{confFile}'"
+    debug fmt"loading settings from: '{confFile}'"
 
     var dict = loadConfig(confFile)
     w.placeName = dict.getSectionValue("User-Loc", "placeName")
@@ -108,11 +110,16 @@ proc getSettings*(w: Weather): bool =
     w.googleUrl = dict.getSectionValue("Weather", "googleUrl")
     w.googleKey = dict.getSectionValue("Weather", "googleKey")
 
-    debug fmt"config file contents: '{confFile}' are:"
-    debug w.placeName & "\n" & w.placeCountry & "\n" & w.placeUnits
-    debug w.latConfig & "\n" & w.lonConfig & "\n" & w.darkskyUrl
-    debug w.darkskyKey & "\n" & w.darkskyExclude
-    debug w.googleUrl & "\n" & w.googleKey
+    debug fmt"config file: '{confFile}' contents are:"
+    debug "    PlaceName   : " & w.placeName
+    debug "    Country     : " & w.placeCountry
+    debug "    Units       : " & w.placeUnits
+    debug "    Lat/Lon     : " & w.latConfig & "/" & w.lonConfig
+    debug "    DarkSky URL : " & w.darkskyUrl
+    debug "    DarkSky Key : " & w.darkskyKey
+    debug "    DarkSky Excl: " & w.darkskyExclude
+    debug "    Google URL  : " & w.googleUrl
+    debug "    Google Key  : " & w.googleKey
 
     result = true
 
@@ -124,13 +131,15 @@ proc putSettings*(w: Weather) =
   ##
   ## PROCEDURE: putSettings
   ## Input: Weather object
-  ## Returns: none
-  ## Description: writes the programs settings file
+  ## Returns: nothing
+  ## Description: writes out the programs settings file which will include
+  ## any changes made to the settings held in the 'weather' object durring
+  ## runtime.
   ##
   let confFile = setConfigFile()
 
   if not existsFile(confFile):
-    debug fmt"*Error* config file: '{confFile}'... missing in proc 'put\Settings()'"
+    debug fmt"*Error* config file: '{confFile}'... missing in proc 'putSettings()'"
 
   var dict = newConfig()
   dict.setSectionKey("User-Loc", "placeName", w.placeName)
@@ -146,4 +155,3 @@ proc putSettings*(w: Weather) =
   dict.writeConfig(confFile)
 
   debug fmt"wrote out config file: '{confFile}'"
-
