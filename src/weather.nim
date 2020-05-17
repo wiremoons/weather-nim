@@ -67,16 +67,16 @@ let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
 var darkSkyUrlFin = fmt"{weather.darkskyUrl}{weather.darkskyKey}/"
 darkSkyUrlFin.add fmt"{latlong}?units="
 darkSkyUrlFin.add fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
-debug fmt"final DarkSky URL:\n{darkSkyUrlFin}\n"
+debug fmt"final DarkSky URL: {darkSkyUrlFin}"
 
 let rawWeatherData = returnWebSiteData(darkSkyUrlFin, weather)
 let weatherJson = returnParsedJson(rawWeatherData)
 weather.extractWeather(weatherJson)
 
-# Obtain Geo Location data
-# Provide a Google API from env variable 'GAPI' of set:
-weather.googleKey = getEnv("GAPI", "")
-
+# Obtain Geo Location data API key
+# If no Google API exists from settings - try from env variable 'GAPI':
+if weather.googleKey == "":
+  weather.googleKey = getEnv("GAPI", "")
 debug fmt"Any stored Google API is: '{weather.googleKey}'"
 
 # only look up place if 'Wthr.googleKey' exists:
