@@ -62,3 +62,10 @@ jobs:
         ./weather -v
         ./weather
         echo "DONE."
+
+    # Saves built file as a relase.
+    #- name: Upload artifact
+    #  uses: actions/upload-artifact@master
+    #  with:
+    #    name: release
+    #    path: bin
