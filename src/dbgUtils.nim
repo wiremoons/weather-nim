@@ -30,4 +30,6 @@
 
 template debug*(data: untyped) =
   when not defined(release):
-    write(stderr, "DEBUG: " & data & ".\n")
+    let pos = instantiationInfo()
+    write(stderr, "DEBUG in " & pos.filename & ":" & $pos.line &
+        " \"" & data & "\".\n")
