@@ -33,10 +33,13 @@ import types
 proc showWeather*(w: Weather) =
   ##
   ## PROCEDURE: showWeather
-  ## Input: none required
-  ## Returns: outputs the weather forecast data obtainned
-  ## Description: display the weather forecats information
+  ## Input: Weather object
+  ## Returns: outputs to the screen the weather forecast data obtained
+  ## Description: display the weather forecast information
   ##
+
+  # check temperature units output type
+  let tUnit = if w.placeUnits == "us": "°F" else: "°C"
 
   echo fmt"""
 
@@ -53,7 +56,7 @@ proc showWeather*(w: Weather) =
  » Weather Currently:
      Summary      : '{w.summary}'
      Windspeed    : {w.windspeed:3.1f} mph
-     Temperature  : {w.temperature:3.1f}°C feels like: {w.feelsLikeTemp:3.1f}°C
+     Temperature  : {w.temperature:3.1f}{tUnit} feels like: {w.feelsLikeTemp:3.1f}{tUnit}
      UV Index     : {w.uvIndex}
 
  » General Outlook:
@@ -70,3 +73,4 @@ Daily Dark Sky API calls made: {w.dsApiCalls}
 
 All is well.
 """
+
