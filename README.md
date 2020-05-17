@@ -45,6 +45,53 @@ Daily Dark Sky API calls made: 36
 All is well.
 ```
 
+## Settings
+
+The application configuration settings are stored in a file located on your 
+computer in different locations, depending on the operating system the program 
+is being run on. On Linux the seeting file will be located here:
+```
+$HOME/.config/weatherApp/settings.ini'
+```
+
+The location and name of the setting file can be found by runing the program 
+with the `help` flag:
+```
+weather -h
+```
+
+Runing the application at least once to have the  settings file created for the 
+computer it is being run on, which will be populated with some basic 'default' settings.
+      
+You can then edit this file in a text editor to change your location by altering
+the follow items: '`placeName`' '`placeCountry`' '`placeUnits`' '`latConfig`' '`lonConfig`'
+         
+The default values for the above are:
+```           
+placeName="Barry, UK"
+placeCountry=UK
+placeUnits=uk2
+latConfig=51.419212
+lonConfig=-3.291481
+```
+
+If the file get corrupted it can be deleted, and new default version will be re-created when the program is next run.
+
+The 'placeUnits' can only be set to '`uk2`','`ca`','`si`' or '`us`'. 
+
+Do not include the quotes or an error `"The given location (or time) is invalid."` will occur.
+
+Using the 'us' setting will provide temperatures in Fahrenheit instead of Celsius.
+
+The automatic geographical look up features of the program can be used if you provide your own Google Places API key. If you wish to use this Google API set the following environment value then run the program to have it added to the setting file: export GAPI="add_your_Google_API_key_here"
+                                         
+Manually obtaining your preferred 'latConfig' and 'lonConfig' details of the weather forecast location latitude and longitude can be found on the internet look up sites such as: 
+                                             
+https://www.mapdevelopers.com/geocode_tool.php
+
+**NOTE:** Work is underway to replace the Google API usage with an open source alternative.
+
+
 ## Development Information
 
 The application in written using the Nim programming language, so can be used on any supported operating systems such as Windows, Linux, FreeBSD, etc. More information about Nim is available here:
