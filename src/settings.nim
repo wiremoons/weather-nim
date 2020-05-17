@@ -68,7 +68,7 @@ proc createDefaultSettings*() =
 
   # create a default set of values for initial configuration
   var dict = newConfig()
-  dict.setSectionKey("User-Loc", "placeName", "Barry")
+  dict.setSectionKey("User-Loc", "placeName", "Barry, UK")
   dict.setSectionKey("User-Loc", "placeCountry", "UK")
   dict.setSectionKey("User-Loc", "placeUnits", "uk")
   dict.setSectionKey("User-Loc", "latConfig", "51.419212")
