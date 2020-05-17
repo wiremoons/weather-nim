@@ -19,6 +19,9 @@ htmldocs/
 bin/*
 *.exe
 
+# any 'aspell' back up files are excluded
+*.bak
+
 # any 'debug.txt' file
 debug.txt
 
