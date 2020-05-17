@@ -27,7 +27,10 @@
 # IN THE SOFTWARE.
 #
 
+# import standard Nim modules
 import strformat, os
+# import or own modules used by the source code directly
+import settings
 
 proc showHelp*() =
   ##
@@ -41,6 +44,45 @@ Purpose
 ¯¯¯¯¯¯¯
  Use the '{paramStr(0)}' application to find the current weather forecast
  information for the geographical planet earth location you provide.
+
+Settings
+¯¯¯¯¯¯¯¯
+ The application configuration settings are stored in a file located on
+ your computer here: '{setConfigFile()}'
+ 
+ Run the application at least once to have the above settings file created for
+ your computer, which will be populated with some basic 'default' settings.
+ 
+ You can then edit this file in a text editor to change your location by altering
+ the follow items: 'placeName' 'placeCountry' 'placeUnits' 'latConfig' 'lonConfig'
+ 
+ The default values for the above are:
+ 
+    placeName="Barry, UK"
+    placeCountry=UK
+    placeUnits=uk2
+    latConfig=51.419212
+    lonConfig=-3.291481
+
+ If the file get corrupted it can be deleted, and new default version will be
+ re-created when the program is next run.
+
+ The 'placeUnits' can only be set to 'uk2','ca','si' or 'us'. Do not include the
+ quotes or an error "The given location (or time) is invalid." will occur.
+ Using the 'us' setting will provide temperatures in Fahrenheit instead of Celsius.
+
+ The automatic geographical look up features of the program can be used if you 
+ provide your own Google Places API key. If you wish to use this Google API set
+ the following environment value then run the program to have it added to the 
+ setting file: export GAPI="add_your_Google_API_key_here"
+ 
+ Manually obtaining your preferred 'latConfig' and 'lonConfig' details of the
+ weather forecast location latitude and longitude can be found on the internet
+ look up sites such as: 
+ 
+    https://www.mapdevelopers.com/geocode_tool.php
+
+ Work is underway to replace the Google API usage with an open source alternative.
 
 Usage
 ¯¯¯¯¯
