@@ -30,7 +30,7 @@
 # import required Nim standard libraries
 import os, strformat, times
 # import source code from our own files
-import getdata, settings, version, help, weatherOutput, types, dbgUtils
+import getdata, settings, version, help, weatherOutput, types, dbgUtils, getgeoloc
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
@@ -87,7 +87,7 @@ if weather.googleKey.len > 0:
 
   let rawGeoData = returnWebSiteData(googlePlaceUrl, weather)
   let placeJson = returnParsedJson(rawGeoData)
-  weather.extractPlace(placeJson)
+  weather.extractGooglePlace(placeJson)
 else:
   debug "skipping Google Place look up as no API key exists"
 
