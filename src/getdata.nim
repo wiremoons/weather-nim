@@ -24,15 +24,15 @@
 # IN THE SOFTWARE.
 #
 
-import httpclient, json, times, strformat, strutils, options
+import httpclient, json, strformat, strutils, options
 
 import types, dbgUtils
 
 proc returnWebSiteData*(webUrl: string, w: Weather): string =
   ##
   ## PROCEDURE: returnWebSiteData
-  ## Input: final URL for DarkSky site to obtain forecast and WeatherObject
-  ## Returns: raw web page body recieved and daily API calls count
+  ## Input: final URL for DarkSky site to obtain forecast and Weather object
+  ## Returns: raw web page body recieved and daily API calls count via w object
   ## Description: open the provided URL returning the web site content received
   ## also extract HTTP header to obtain API calls total. API calls total is
   ## updated directly into the Weather (w) passed to the proc.
@@ -110,9 +110,12 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
       description: string
       uri: string
 
-  # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
   debug fmt"unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'"
+
+  # local 'weather' var created from above 'WeatherForcast' object type
   var weather: WeatherForecast
+
+  # unmarshall 'jsonDataWeather' to object structure 'WeatherForecast'
   try:
     weather = to(jsonDataWeather, WeatherForecast)
   except:
@@ -124,10 +127,9 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
   # get values needed from weather forecast JSON data:
   debug fmt"JSON unmarshall process completed"
   # below outputs all data or 'nil' if unmarshall above fails...
-  # TODO: add debug option to dump data to file?
   #echo repr weather
 
-  # ensure unmarshall worked and data was extracted ok...
+  # ensure unmarshall worked and data was extracted ok... otherwise quit()
   if isNil weather:
     echo "FATAL ERROR: unmarshall of JSON weather provided no data"
     quit 3
@@ -152,6 +154,8 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
     let newAlertsSeq = weather.alerts.get()
     echo "Alerts Sequenece is:", repr(newAlertsSeq)
     # Weather Alerts extraction - only if any exist:
+    # TODO : comoplete code below when alert avilable or test data used to
+    # supports its development
     # if weather.alerts.len > 0:
     #   when not defined(release):
     #     echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
