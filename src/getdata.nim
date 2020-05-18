@@ -184,37 +184,3 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
     #   Wthr.alertsDump.add("")
   else:
     debug fmt"no weather 'alerts' data identified"
-
-proc extractPlace*(w: Weather, jsonDataPlace: JsonNode) =
-  ##
-  ## PROCEDURE: returnPlace
-  ## Input: Weather object, JsonNode (from Google Places API site)
-  ## Returns: outputs the place name found in the JSON node provided.
-  ## Description: use the JSON object to obtain place name. Use a structure to
-  ## hold unmarshaled data, before the place name is extracted
-  ##
-
-  # structure to hold unmarshaled data (created using 'nimjson' tool)
-  type
-    GeoPlace = ref object
-      results: seq[Results]
-      status: string
-    Results = ref object
-      formatted_address: string
-
-  # unmarshall 'jsonData' to object structure 'GeoPlace'
-  let place = to(jsonDataPlace, GeoPlace)
-
-  # check if web site request was handled - if so extract data neded:
-  if place.status == "OK":
-    # extract one value 'formatted_address' from 'GeoPlace.Results' seq:
-    for item in place.results:
-      w.placeName = item.formatted_address
-  else:
-    if place.status == "REQUEST_DENIED":
-      echo fmt"ERROR: proc 'returnPlace' has request status : '{place.status}'."
-      echo "Check the Google Places API key is correct and available."
-    else:
-      echo fmt"ERROR: proc 'returnPlace' has request status : '{place.status}'."
-    # no place name obtained so return as such
-    w.placeName = "UNKNOWN"
