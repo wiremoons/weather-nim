@@ -56,11 +56,11 @@ if paramCount() > 0:
     echo "Unknown command line parameter given - see options below:"
     showHelp()
 
-# get settings if exist - if not create them with default version...
-while not weather.getSettings():
+# get app settings if they exist - if not create them with default version...
+while not getSettings(weather):
   createDefaultSettings()
 
-# create combined latitude and longitude into one variable for Urls:
+# create combined latitude and longitude into one variable for use in URLs:
 let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
 
 # contruct DarkSky URL from settings:
@@ -69,27 +69,40 @@ darkSkyUrlFin.add fmt"{latlong}?units="
 darkSkyUrlFin.add fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
 debug fmt"final DarkSky URL: {darkSkyUrlFin}"
 
+# get the weather from DarkSky and process it
 let rawWeatherData = returnWebSiteData(darkSkyUrlFin, weather)
 let weatherJson = returnParsedJson(rawWeatherData)
 weather.extractWeather(weatherJson)
 
-# Obtain Geo Location data API key
+# Obtain Geo Location data: try Google APi first, fallback to OpenStreet Map
+#
 # If no Google API exists from settings - try from env variable 'GAPI':
 if weather.googleKey == "":
   weather.googleKey = getEnv("GAPI", "")
 debug fmt"Any stored Google API is: '{weather.googleKey}'"
 
-# only look up place if 'Wthr.googleKey' exists:
+# only look up place with Google API if 'weather.googleKey' exists:
 if weather.googleKey.len > 0:
   var googlePlaceUrl = fmt"{weather.googleUrl}latlng={latlong}"
   googlePlaceUrl.add fmt"&result_type=locality&key={weather.googleKey}"
-  debug "final Google Place URL:\n" & googlePlaceUrl & "\n"
-
+  debug "final Google Place URL:" & googlePlaceUrl
+  # get the place name from Google and process it
   let rawGeoData = returnWebSiteData(googlePlaceUrl, weather)
   let placeJson = returnParsedJson(rawGeoData)
-  weather.extractGooglePlace(placeJson)
+  extractGooglePlace(weather, placeJson)
 else:
   debug "skipping Google Place look up as no API key exists"
+  # perform a look up using the OpenStreet Map APIs instead
+  # https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=-34.44076&lon=-58.70521
+  var openStMapPlaceUrl = "https://nominatim.openstreetmap.org/reverse?"
+  openStMapPlaceUrl.add "format=jsonv2&"
+  openStMapPlaceUrl.add fmt("lat={weather.latConfig}&")
+  openStMapPlaceUrl.add fmt("lon={weather.lonConfig}")
+  debug "final OpenStreetMap place URL:" & openStMapPlaceUrl
+  # get the place name from OpenStreetMap and process it
+  let rawGeoData = returnWebSiteData(openStMapPlaceUrl, weather)
+  let placeJson = returnParsedJson(rawGeoData)
+  extractOsmPlace(weather, placeJson)
 
 # obtain variables with better formating or additional infor for output
 weather.latBearing = if weather.latitude < 0: "°S" else: "°N"

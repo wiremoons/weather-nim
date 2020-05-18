@@ -30,7 +30,7 @@ import types, dbgUtils
 
 proc extractGooglePlace*(w: Weather, jsonDataPlace: JsonNode) =
   ##
-  ## PROCEDURE: returnPlace
+  ## PROCEDURE: returnGooglePlace
   ## Input: Weather object, JsonNode (from Google Places API site)
   ## Returns: outputs the place name found in the JSON node provided.
   ## Description: use the JSON object to obtain place name. Use a structure to
@@ -63,3 +63,38 @@ proc extractGooglePlace*(w: Weather, jsonDataPlace: JsonNode) =
       echo fmt"ERROR: proc 'returnPlace' has request status : '{place.status}'."
     # no place name obtained so return as such
     w.placeName = "UNKNOWN"
+
+proc extractOsmPlace*(w: Weather, jsonDataPlace: JsonNode) =
+  ##
+  ## PROCEDURE: returnOsmPlace
+  ## Input: Weather object, JsonNode (from OpenStreetMap site)
+  ## Returns: outputs the place name found in the JSON node provided.
+  ## Description: use the JSON object to obtain place name. Use a structure to
+  ## hold unmarshaled data, before the place name is extracted
+  ##
+
+  # structure to hold unmarshaled data (created using 'nimjson' tool)
+
+  type
+    GeoPlace = ref object
+      address: Address
+    Address = ref object
+      town: string
+      country: string
+
+  debug "Attempting to identify place from lat/lon using OpenStreetMap..."
+
+  # unmarshall 'jsonData' to object structure 'GeoPlace'
+  let place = to(jsonDataPlace, GeoPlace)
+
+  # check if web site request was handled - if so extract data neded:
+  if place.address.town != "":
+    debug "OpenStreetMap town: " & place.address.town
+    debug "OpenStreetMap country: " & place.address.country
+    w.placeName = fmt"{place.address.town}, {place.address.country}"
+  else:
+    debug "ERROR: OpenStreetMap failed to provide 'town' place name"
+    #no place name obtained so return as
+    w.placeName = "UNKNOWN"
+
+

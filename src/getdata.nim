@@ -42,6 +42,10 @@ proc returnWebSiteData*(webUrl: string, w: Weather): string =
   let response = client.get(webUrl)
   result = response.body
 
+  debug "web site reponse: " & response.status
+  # output all recived web site data with below if needed
+  #debug "web data receivedL " & result
+
   if response.code != Http200:
     stderr.writeLine "\nFATAL ERROR: web site returned unexpected status of: ",
         response.status, "\n"
@@ -63,6 +67,8 @@ proc returnParsedJson*(rawJsonData: string): JsonNode =
   ## Description: read raw json data passed to the function and try to convert
   ## it into a JSON node object. If fails then raise an exception.
   ##
+  debug "running: 'proc returnParsedJson'"
+
   try:
     result = parseJson(rawJsonData)
   except JsonParsingError:
