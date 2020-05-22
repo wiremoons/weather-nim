@@ -38,16 +38,16 @@ proc showVersion*() =
   ## version, plus license information sources.
   ##
   const ver = when defined(release): "release" else: "debug"
-  const buildV = fmt"Build is: {ver} using Nim compiler version: {NimVersion}"
+  const buildV = fmt"Built as '{ver}' using Nim compiler version: '{NimVersion}'"
   const NimblePkgVersion {.strdefine.} = "Unknown"
   let appName = extractFilename(getAppFilename())
 
   echo fmt"""
 
 '{appName}' is version: '{NimblePkgVersion}' running on '{hostOS}' ({hostCPU}).
+Compiled on: {CompileDate} @ {CompileTime}.
 Copyright (c) 2020 Simon Rowe.
 
-Compiled on: {CompileDate} @ {CompileTime}.
 {buildV}.
 
 For licenses and further information visit:
