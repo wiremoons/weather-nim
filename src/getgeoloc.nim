@@ -96,5 +96,3 @@ proc extractOsmPlace*(w: Weather, jsonDataPlace: JsonNode) =
     debug "ERROR: OpenStreetMap failed to provide 'town' place name"
     #no place name obtained so return as
     w.placeName = "UNKNOWN"
-
-
