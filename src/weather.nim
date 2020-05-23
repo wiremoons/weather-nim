@@ -30,7 +30,8 @@
 # import required Nim standard libraries
 import os, strformat, times
 # import source code from our own files
-import getdata, settings, version, help, weatherOutput, types, dbgUtils, getgeoloc
+import getdata, settings, version, help, weatherOutput, types, dbgUtils,
+  getgeoloc, yesno, getplace
 
 #///////////////////////////////////////////////////////////////
 #                      MAIN START
@@ -41,7 +42,8 @@ import getdata, settings, version, help, weatherOutput, types, dbgUtils, getgeol
 
 # create a new weather object - see 'types.nim'
 var weather = Weather()
-
+# default is not to offer to lookup a new location
+var needPlace = false
 
 let args = commandLineParams()
 
@@ -52,6 +54,8 @@ if paramCount() > 0:
     showHelp()
   of "-v", "--version":
     showVersion()
+  of "-p", "--place":
+    needPlace = true
   else:
     echo "Unknown command line parameter given - see options below:"
     showHelp()
@@ -59,6 +63,41 @@ if paramCount() > 0:
 # get app settings if they exist - if not create them with default version...
 while not getSettings(weather):
   createDefaultSettings()
+  # created a new 'default' settings file so also add a location too?
+  needPlace = true
+
+# Obtain Geo Location data: try Google API first..
+# If no key in the settings or in env variable 'GAPI' the
+# program will fallback to OpenStreet Map when needed..
+#
+# If no Google API exists from settings - try from env variable 'GAPI':
+if weather.googleKey == "":
+  weather.googleKey = getEnv("GAPI", "")
+debug fmt"Any stored Google API is: '{weather.googleKey}'"
+
+# check if there is a reason to setup a new location
+if needPlace and getYesNo("Would you like to add your weather forecast location?"):
+  debug "User request the addition of a new location..."
+
+  if weather.googleKey.len > 0:
+    # do place lookup with Google API key
+    #https://maps.googleapis.com/maps/api/geocode/json?address=barry&region=gb&key=KEY_HERE
+    # https://maps.googleapis.com/maps/api/geocode/json?
+    debug "Google API place lookup starting..."
+    var googlePlaceCheckUrl = fmt"{weather.googleUrl}address={getPlaceAddress()}"
+    googlePlaceCheckUrl.add fmt"&region={getPlaceRegion()}"
+    googlePlaceCheckUrl.add fmt"&key={weather.googleKey}"
+    debug "final Google Place URL:" & googlePlaceCheckUrl
+  else:
+    # fall back to OpenStreet Map place lookup
+    # URL format to lookup a postcode from OpenStreet Map:
+    # https://nominatim.openstreetmap.org/?addressdetails=1&q=cf62+8db&format=json&limit=1
+    # https://nominatim.openstreetmap.org/?addressde%20tails=1&q=1+sandringham+close.+barry&countrycodes=gb&format=json&limit=1
+    var osmPlaceCheckUrl = "https://nominatim.openstreetmap.org/?addressdetails=1"
+    osmPlaceCheckUrl.add fmt"&countrycodes={getPlaceRegion()}"
+    osmPlaceCheckUrl.add fmt"&q={getPlaceAddress()}"
+    osmPlaceCheckUrl.add fmt"&format=json&limit=1"
+    debug fmt"final OSM place URL: {osmPlaceCheckUrl}"
 
 # create combined latitude and longitude into one variable for use in URLs:
 let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
@@ -74,19 +113,12 @@ let rawWeatherData = returnWebSiteData(darkSkyUrlFin, weather)
 let weatherJson = returnParsedJson(rawWeatherData)
 weather.extractWeather(weatherJson)
 
-# Obtain Geo Location data: try Google APi first, fallback to OpenStreet Map
-#
-# If no Google API exists from settings - try from env variable 'GAPI':
-if weather.googleKey == "":
-  weather.googleKey = getEnv("GAPI", "")
-debug fmt"Any stored Google API is: '{weather.googleKey}'"
-
 # only look up place with Google API if 'weather.googleKey' exists:
 if weather.googleKey.len > 0:
   var googlePlaceUrl = fmt"{weather.googleUrl}latlng={latlong}"
   googlePlaceUrl.add fmt"&result_type=locality&key={weather.googleKey}"
   debug "final Google Place URL:" & googlePlaceUrl
-  # get the place name from Google and process it
+  # get the place name using lat/lon from Google and process it
   let rawGeoData = returnWebSiteData(googlePlaceUrl, weather)
   let placeJson = returnParsedJson(rawGeoData)
   extractGooglePlace(weather, placeJson)
@@ -113,3 +145,5 @@ weather.timeFormated = fromUnix(weather.forecastTime).format("ddd dd MMM yyyy HH
 # run proc to output all collated weather information
 weather.showWeather()
 weather.putSettings()
+# exit cleanly
+quit(QuitSuccess)
