@@ -73,4 +73,3 @@ Daily Dark Sky API calls made: {w.dsApiCalls}
 
 All is well.
 """
-
