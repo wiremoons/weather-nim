@@ -64,7 +64,15 @@ if paramCount() > 0:
 while not getSettings(weather):
   createDefaultSettings()
   # created a new 'default' settings file so also add a location too?
-  needPlace = true
+  #needPlace = true #<- disabled as app not runing by default, message instead
+  echo fmt"""
+
+    NOTE: a default configuration has been added to the settings file...
+     
+    Re-run as:  '{extractFilename(getAppFilename())} -p'  to re-configure.
+    This command lets you choose your own preferred weather forecast location.
+    See output of: '{extractFilename(getAppFilename())} -h' for more information.
+    """
 
 # Obtain Geo Location data: try Google API first..
 # If no key in the settings or in env variable 'GAPI' the
