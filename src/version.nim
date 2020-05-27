@@ -51,7 +51,7 @@ Copyright (c) 2020 Simon Rowe.
 {buildV}.
 
 For licenses and further information visit:
-   - Weather application     :  https://github.com/wiremoons/weather-nim/
+   - Weather application     :  https://github.com/wiremoons/weather/
    - Nim language & compiler :  https://github.com/nim-lang/Nim/
 
 All is well.
