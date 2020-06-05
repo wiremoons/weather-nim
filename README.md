@@ -3,6 +3,14 @@
 # weather
 Command line application to obtain current weather forecast from DarkSky.
 
+**UPDATE: 05 June 2020** up to this date I had included my DarkSky API key
+within the application to allow others to make use of the program more easliy.
+Sadly from this date the API key is no longer included within the program as a 
+selfish person abused the API key, and consequently used up all the daily free
+API calls available, blocking the programs use for anyone else.
+If you have your own DarkSky API key you can still add it to the program in the settings 
+file manually. Otherwise for now the program may no longer function.
+
 
 ## Application Usage
 
