@@ -64,7 +64,7 @@ if paramCount() > 0:
 while not getSettings(weather):
   createDefaultSettings()
   # created a new 'default' settings file so also add a location too?
-  #needPlace = true #<- disabled as app not runing by default, message instead
+  #needPlace = true #<- disabled so apps runs without prompt by default
   echo fmt"""
 
     NOTE: a default configuration has been added to the settings file...
@@ -73,6 +73,30 @@ while not getSettings(weather):
     This command lets you choose your own preferred weather forecast location.
     See output of: '{extractFilename(getAppFilename())} -h' for more information.
     """
+
+# check for valid DarkSky API key - abort if one not available. Step added on
+# 05 June 2002 due to abuse of API Key supplied with program prior to this date.
+# If no Google API exists from settings - try from env variable 'GAPI':
+if weather.darkskyKey == "":
+  echo ""
+  echo "WARNING: No DarkSky API key found in the settings file..."
+  echo "         checking environment variable: 'DSAPI' for users key."
+  weather.darkskyKey = getEnv("DSAPI", "")
+  if weather.darkskyKey == "":
+    echo """
+         No key found in the environment variable 'DSAPI' either...
+
+         Add your key to the settings file, or via the environment as:
+    
+             export DSAPI="Your_DarkSky_API_Key_Here"
+    
+         Unable to continue - program exiting...
+    """
+    debug fmt"ABORT: no stored or provided DarkSky API key found: '{weather.darkskyKey}'" 
+    quit (100)
+
+debug fmt"Stored DarkSky API key is: '{weather.darkskyKey}'"
+
 
 # Obtain Geo Location data: try Google API first..
 # If no key in the settings or in env variable 'GAPI' the

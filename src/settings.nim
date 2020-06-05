@@ -74,7 +74,7 @@ proc createDefaultSettings*() =
   dict.setSectionKey("User-Loc", "latConfig", "51.419212")
   dict.setSectionKey("User-Loc", "lonConfig", "-3.291481")
   dict.setSectionKey("Weather", "darkskyUrl", "https://api.darksky.net/forecast/")
-  dict.setSectionKey("Weather", "darkskyKey", "66fd639c6914180e12c355899c5ec267")
+  dict.setSectionKey("Weather", "darkskyKey", "")
   dict.setSectionKey("Weather", "darkskyExclude", "minutely,hourly")
   dict.setSectionKey("Weather", "googleUrl", "https://maps.googleapis.com/maps/api/geocode/json?")
   dict.setSectionKey("Weather", "googleKey", "")
