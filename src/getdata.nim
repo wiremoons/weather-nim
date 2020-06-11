@@ -162,31 +162,23 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
     # Weather Alerts extraction - only if any exist:
     # TODO : comoplete code below when alert avilable or test data used to
     # supports its development
-    # if weather.alerts.len > 0:
-    #   when not defined(release):
-    #     echo fmt"DEBUG: found 'weather Alerts': {weather.alerts.len}"
-    #   Wthr.alertTotal = weather.alerts.len
-    #   var alertRegions:string
-    #   # for each weather alert found extract into a formated string
-    #   # for displayed as a formated block in the final 'weatherOutput.nim'
-    #   for item in weather.alerts:
-    #     # regions are stored in a seq - so obtian all first
-    #     for regionitem in item.regions:
-    #       alertRegions.add(regionitem)
-
-    #     # remove any newlines
-    #     stripLineEnd(item.description)
-    #     # build this formated text block for each alert:
-    #     Wthr.alertsDump.add(fmt"""
-    #   Alert Summary : '{item.title}'
-    #   Alert region  : '{alertRegions}' with severity of '{item.severity}'.
-    #   Alert starts  : {$fromUnix(item.time)} and ends: {$fromUnix(item.expires)}.
-    #   Description   : {item.description}
-    #   More details  : {item.uri}""")
-    # # no weather alerts found
-    # else:
-    #   echo "No alerts found"
-    #   Wthr.alertTotal = 0
-    #   Wthr.alertsDump.add("")
+    if newAlertsSeq.len > 0:
+      w.alertTotal = newAlertsSeq.len
+      debug fmt"found total 'weather Alerts': {w.alertTotal}"
+      #var
+      # for each weather alert found extract into a formated
+      # for displayed as a formated block in the final
+      for item in newAlertsSeq:
+        echo repr(item)
+        # regions are stored in a seq - so obtian all
+        # for regionitem in 
+          # Alert Summary : 
+          # Alert region  : '{alertRegions}' with severity of 
+          # Alert starts  : {$fromUnix(item.time)} and ends: 
+          # Description   : 
+          # More details  : 
+          #no weather
+          #else:
+          # echo "No alerts 
   else:
     debug fmt"no weather 'alerts' data identified"
