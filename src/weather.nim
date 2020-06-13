@@ -63,7 +63,7 @@ if paramCount() > 0:
 # get app settings if they exist - if not create them with default version...
 while not getSettings(weather):
   createDefaultSettings()
-  # created a new 'default' settings file so also add a location too?
+  # above created a new 'default' settings file so also add a location too?
   #needPlace = true #<- disabled so apps runs without prompt by default
   echo fmt"""
 
@@ -74,9 +74,9 @@ while not getSettings(weather):
     See output of: '{extractFilename(getAppFilename())} -h' for more information.
     """
 
-# check for valid DarkSky API key - abort if one not available. Step added on
-# 05 June 2002 due to abuse of API Key supplied with program prior to this date.
-# If no Google API exists from settings - try from env variable 'GAPI':
+# Check for valid DarkSky API key - abort if none available. 
+# This step was added to the program on 05 June 2002 due to abuse of the
+# previously included DarkSky API Key
 if weather.darkskyKey == "":
   echo ""
   echo "WARNING: No DarkSky API key found in the settings file..."
@@ -112,19 +112,19 @@ if needPlace and getYesNo("Would you like to add your weather forecast location?
   debug "User request the addition of a new location..."
 
   if weather.googleKey.len > 0:
-    # do place lookup with Google API key
-    #https://maps.googleapis.com/maps/api/geocode/json?address=barry&region=gb&key=KEY_HERE
-    # https://maps.googleapis.com/maps/api/geocode/json?
+    # Have a key - so do place lookup with Google API key. 
+    # Example lookup URL:
+    # https://maps.googleapis.com/maps/api/geocode/json?address=barry&region=gb&key=KEY_HERE
     debug "Google API place lookup starting..."
     var googlePlaceCheckUrl = fmt"{weather.googleUrl}address={getPlaceAddress()}"
     googlePlaceCheckUrl.add fmt"&region={getPlaceRegion()}"
     googlePlaceCheckUrl.add fmt"&key={weather.googleKey}"
     debug "final Google Place URL:" & googlePlaceCheckUrl
   else:
-    # fall back to OpenStreet Map place lookup
+    # Fall back to OpenStreet Map place lookup
     # URL format to lookup a postcode from OpenStreet Map:
-    # https://nominatim.openstreetmap.org/?addressdetails=1&q=cf62+8db&format=json&limit=1
-    # https://nominatim.openstreetmap.org/?addressde%20tails=1&q=1+sandringham+close.+barry&countrycodes=gb&format=json&limit=1
+    # https://nominatim.openstreetmap.org/?addressdetails=1&q=cf62+4db&format=json&limit=1
+    # https://nominatim.openstreetmap.org/?addressde%20tails=1&q=9+high+street.+barry&countrycodes=gb&format=json&limit=1
     var osmPlaceCheckUrl = "https://nominatim.openstreetmap.org/?addressdetails=1"
     osmPlaceCheckUrl.add fmt"&countrycodes={getPlaceRegion()}"
     osmPlaceCheckUrl.add fmt"&q={getPlaceAddress()}"
@@ -134,7 +134,7 @@ if needPlace and getYesNo("Would you like to add your weather forecast location?
 # create combined latitude and longitude into one variable for use in URLs:
 let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
 
-# contruct DarkSky URL from settings:
+# construct DarkSky URL from settings:
 var darkSkyUrlFin = fmt"{weather.darkskyUrl}{weather.darkskyKey}/"
 darkSkyUrlFin.add fmt"{latlong}?units="
 darkSkyUrlFin.add fmt"{weather.placeUnits}&exclude={weather.darkskyExclude}"
