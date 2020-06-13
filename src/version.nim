@@ -27,7 +27,7 @@
 # IN THE SOFTWARE.
 #
 
-import strformat, os
+import strformat, os, strutils
 
 proc showVersion*() =
   ##
@@ -41,11 +41,12 @@ proc showVersion*() =
   const buildV = fmt"Built as '{ver}' using Nim compiler version: '{NimVersion}'"
   const NimblePkgVersion {.strdefine.} = "Unknown"
   let appName = extractFilename(getAppFilename())
+  let hostData = fmt"{capitalizeAscii(hostOS)} ({toUpperAscii(hostCPU)})"
 
   echo fmt"""
 
-'{appName}' is version: '{NimblePkgVersion}' running on '{hostOS}' ({hostCPU}).
-Compiled on: {CompileDate} @ {CompileTime}.
+'{appName}' is version: '{NimblePkgVersion}' running on: '{hostData}'.
+Compiled on: {CompileDate} @ {CompileTime} UTC.
 Copyright (c) 2020 Simon Rowe.
 
 {buildV}.
