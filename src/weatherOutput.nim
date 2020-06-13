@@ -43,27 +43,20 @@ proc showWeather*(w: Weather) =
 
   echo fmt"""
 
-                            WEATHER  FORECAST
-
+CURRENT  WEATHER  FORECAST  DATA
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
  » Weather timezone     : {w.timezone}
  » Weather place name   : {w.placeName}
  » Latitude & longitude : {w.latitude} {w.latBearing}, {w.longitude} {w.lonBearing}
-
-∞∞ Forecast ∞∞
-
  » Forecast Date        : {w.timeFormated}
 
- » Weather Currently:
-     Summary      : '{w.summary}'
-     Windspeed    : {w.windspeed:3.1f} mph
-     Temperature  : {w.temperature:3.1f}{tUnit} feels like: {w.feelsLikeTemp:3.1f}{tUnit}
-     UV Index     : {w.uvIndex}
-
- » General Outlook:
-     Summary      : '{w.daysOutlook}'
-
- » Weather Alerts:
-     Total Issued : '{w.alertTotal}'
+ » Weather Currently
+     Summary            : '{w.summary}'
+     Windspeed          : {w.windspeed:3.1f} mph
+     Temperature        : {w.temperature:3.1f}{tUnit} feels like: {w.feelsLikeTemp:3.1f}{tUnit}
+     UV Index           : {w.uvIndex}
+     Summary            : '{w.daysOutlook}'
+     Alerts Issued      : '{w.alertTotal}'
      
 {w.alertsDump}
 
