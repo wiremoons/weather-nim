@@ -15,40 +15,36 @@ file manually. Otherwise for now the program may no longer function.
 ## Application Usage
 
 Below is screen capture of a current weather forecast obtained by running 
-the application as of version '0.5.4':
+the application as of version '0.8.0':
 ```
-
-                            WEATHER  FORECAST
-
+CURRENT  WEATHER  FORECAST  DATA
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
  » Weather timezone     : Europe/London
- » Weather place name   : Barry, UK
+ » Weather place name   : Barry, United Kingdom
  » Latitude & longitude : 51.419212 °N, -3.291481 °W
+ » Forecast Date        : Sat 13 Jun 2020 14:50:58
 
-∞∞ Forecast ∞∞
+ » Weather Currently
+     Summary            : 'Mostly Cloudy'
+     Windspeed          : 11.3 mph
+     Temperature        : 18.3°C feels like: 18.3°C
+     UV Index           : 4
+     Summary            : 'Rain today through Thursday.'
+     Alerts Issued      : '1'
+     
+ » Weather Alert 
+     Alert Title        : 'Yellow Thunderstorms Warning For United Kingdom - Wales'
+     Region(s) Impacted :  Wales
+     Weather Severity   : 'WARNING'
+     Alert Valid From   : Sat 13 Jun 2020 12:00:00
+     Alert Ending on    : Sat 13 Jun 2020 19:00:00
+     Further Details    : http://meteoalarm.eu/en_UK/0/0/UK016.html
+     Alert Description: Some heavy showers and thunderstorms could disrupt travel and power in a few places. Some damage to a few buildings and structures from lightning strikes is possible. There is a good chance driving conditions will be affected by spray, standing water and/or hail, leading to longer journey times by car and bus. Some short term loss of power and other services is likely. There is a small chance of some flooding of a few homes and businesses.
 
- » Forecast Date        : Wed 06 May 2020 21:46:31
-
- » Weather Currently:
-     Summary      : 'Overcast'
-     Windspeed    : 5.4 mph
-     Temperature  : 17.6°C feels like: 17.6°C
-     UV Index     : 2
-
- » General Outlook:
-     Summary      : 'Possible light rain on Friday.'
-
- » Weather Alerts:
-     Total Issued : '1'
-
-     Alert Summary : 'Yellow Thunderstorms Warning For United Kingdom - Wales'
-     Alert region  : 'Wales' with severity of 'warning'.
-     Alert starts  : 2020-04-12T16:00:00+01:00 and ends: 2020-04-13T01:00:00+01:00.
-     Description   : Thunderstorms may cause flooding and power cuts in a few places.
-     More details  : http://meteoalarm.eu/en_UK/0/0/UK016.html
 
 Weather forecast data: Powered by Dark Sky™
 Visit: https://darksky.net/poweredby/
-Daily Dark Sky API calls made: 36
+Daily Dark Sky API calls made: 33
 
 All is well.
 ```
