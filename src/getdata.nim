@@ -24,7 +24,7 @@
 # IN THE SOFTWARE.
 #
 
-import httpclient, json, strformat, strutils, options
+import httpclient, json, strformat, strutils, options, times
 
 import types, dbgUtils
 
@@ -156,12 +156,10 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
 
   if weather.alerts.isSome():
     debug fmt"optional weather 'Alerts' data available... extracting"
-
+    # now we have some - extract the JSON weather alerts sequence also 
     let newAlertsSeq = weather.alerts.get()
-    echo "Alerts Sequenece is:", repr(newAlertsSeq)
+    debug fmt"Alerts Sequenece is: {repr(newAlertsSeq)}"
     # Weather Alerts extraction - only if any exist:
-    # TODO : comoplete code below when alert avilable or test data used to
-    # supports its development
     if newAlertsSeq.len > 0:
       w.alertTotal = newAlertsSeq.len
       debug fmt"found total 'weather Alerts': {w.alertTotal}"
@@ -169,16 +167,25 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
       # for each weather alert found extract into a formated
       # for displayed as a formated block in the final
       for item in newAlertsSeq:
-        echo repr(item)
-        # regions are stored in a seq - so obtian all
-        # for regionitem in 
-          # Alert Summary : 
-          # Alert region  : '{alertRegions}' with severity of 
-          # Alert starts  : {$fromUnix(item.time)} and ends: 
-          # Description   : 
-          # More details  : 
-          #no weather
-          #else:
-          # echo "No alerts 
+        # echo repr(item)
+        let sdate:string = $fromUnix(item.time).format("ddd dd MMM yyyy HH:mm:ss")
+        let edate:string = $fromUnix(item.expires).format("ddd dd MMM yyyy HH:mm:ss")
+        var regionAll:string        
+        # regions is containedin a seq - so obtian all
+        for regionitem in item.regions: 
+          regionAll.add fmt" {regionitem}"
+        
+        w.alertsDump.add fmt"""
+ » Weather Alert 
+     Alert Title        : '{item.title}'
+     Region(s) Impacted : {regionAll}
+     Weather Severity   : '{toUpperAscii(item.severity)}'
+     Alert Valid From   : {sdate}
+     Alert Ending on    : {edate}
+     Further Details    : {item.uri}
+     Alert Description: {item.description}"""
+    else:
+      echo "No alert data found."
+
   else:
     debug fmt"no weather 'alerts' data identified"
