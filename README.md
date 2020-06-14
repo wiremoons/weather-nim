@@ -4,7 +4,7 @@
 Command line application to obtain current weather forecast from DarkSky.
 
 **UPDATE: 05 June 2020** up to this date I had included my DarkSky API key
-within the application to allow others to make use of the program more easliy.
+within the application to allow others to make use of the program more easily.
 Sadly from this date the API key is no longer included within the program as a 
 selfish person abused the API key, and consequently used up all the daily free
 API calls available, blocking the programs use for anyone else.
@@ -57,14 +57,18 @@ is being run on. On Linux the seeting file will be located here:
 ```
 $HOME/.config/weatherApp/settings.ini'
 ```
+On the Windows operating system the file will be located here:
+```
+C:\Users\<USERNAME>\AppData\Roaming\weatherApp\settings.ini
+```
 
-The location and name of the setting file can be found by runing the program 
-with the `help` flag:
+The location of the setting file can be found by running the program 
+with the `help` flag, and look at the first part of the output:
 ```
 weather -h
 ```
 
-Runing the application at least once to have the  settings file created for the 
+Running the application at least once to have the  settings file created for the 
 computer it is being run on, which will be populated with some basic 'default' settings.
       
 You can then edit this file in a text editor to change your location by altering
@@ -87,13 +91,20 @@ Do not include the quotes or an error `"The given location (or time) is invalid.
 
 Using the 'us' setting will provide temperatures in Fahrenheit instead of Celsius.
 
-The automatic geographical look up features of the program can be used if you provide your own Google Places API key. If you wish to use this Google API set the following environment value then run the program to have it added to the setting file: export GAPI="add_your_Google_API_key_here"
-                                         
+**Google Place API Key Usage (optional)***
+
+The automatic geographical look up features of the program can optionally be used with the *Google Places API* if you provide your own Google Places API key. If you wish to use this Google API set the following environment value then run the program to have it added to the setting file: 
+```
+export GAPI="add_your_Google_API_key_here"
+```
+
+**Non Google API Key Usage (default)***
+
+The automatic use of a public geolocation API is used instead of Google - if needed by the user. To invoke the look up feature, run the *weather* program with the command: `weather -p` 
+
 Manually obtaining your preferred 'latConfig' and 'lonConfig' details of the weather forecast location latitude and longitude can be found on the internet look up sites such as: 
                                              
 https://www.mapdevelopers.com/geocode_tool.php
-
-**NOTE:** Work is underway to replace the Google API usage with an open source alternative.
 
 
 ## Development Information
@@ -114,14 +125,41 @@ The instruction below are for Linux, and have been tested on Raspbian '*Buster*'
 To build 'weather' from source on a Linux based system, the following steps can be used:
 
 1. Install the Nim compiler and a C compiler such as gcc or CLang, plus the OpenSSL library. More information on installing Nim can be found here: [Nim Download](https://nim-lang.org/install.html).
-2. Once Nim is installed and workimg on your system, you can clone this GitHub repo with the command: `git clone https://github.com/wiremoons/weather.git`
-3. Then in the cloned code directory for `weather` use Nimble to build a release version with the command: `nimble release`.   Other Nimble build commands can be seen by runing: `nimble tasks`.
+2. Once Nim is installed and working on your system, you can clone this GitHub repo with the command: `git clone https://github.com/wiremoons/weather.git`
+3. Then in the cloned code directory for `weather` use Nimble to build a release version with the command: `nimble release`.   Other Nimble build commands can be seen by running: `nimble tasks`.
 4. The compiled binary of `weather` can now be found in the `./bin` sub directory. Just copy it somewhere in you path, and it should work when run.
 
+From June 2020 the `weather` application requires the user to add their own DarkSky API key for the program to function.
+This can be added directly to the settings file, or add it to the `DSAPI` environment variable, and run the program for it
+to be added for you. This step is only needed when the program is run for the first time. On Linux, from a command line (terminal) windows add your DarkSky API key to the environment variable `DSAPI`:
+```
+export DSAPI="add_api_key_here"
+```
 
 ### Windows 10
 
-The instruction below have been tested on Windows 10 as of March 2020.
+The instruction below have been tested on Windows 10 only, but should perform the same on most older versions too.
+
+The quickest way I have found to install Nim and then build the `weather` program your self is following the steps:
+
+1. Open a POwershell command line window
+2. Install the packages manager [scoop](https://scoop.sh/) by running: `iwr -useb get.scoop.sh | iex`
+3. Install the packages: Nim; OpenSSL; Git; and GCC: `scoop install nim openssl git gcc`
+4. Clone the *Weather* projects to your computer: `git clone https://github.com/wiremoons/weather.git`
+5. Change directory into the newly create source directory :  `cd weather`
+6. Build the *weather* application: `nimble relese`
+7. The build binary file should be located in the `bin` sub directory - run it with: `.\bin\weather.exe -v`
+
+You should now copy the `weather.exe` file to a directory in your PATH to make it easier to use. Before it will work,
+the set up needs to be completed, as below:
+
+From June 2020 the `weather` application requires the user to add their own DarkSky API key for the program to function.
+This can be added directly to the settings file, or add it to the `DSAPI` environment variable, and run the program for it
+to be added for you. This step is only needed when the program is run for the first time. On Windows, open a Powershell 
+command line window, and add your DarkSky API key to the environment variable `DSAPI`:
+```
+$env:DSAPI="add_api_key_here"
+```
 
 **ADD MORE INFO HERE**
 
@@ -146,7 +184,7 @@ A special thank you to [@Yardanico](https://github.com/Yardanico) who very kindl
 
 And of course all the other people who develop and make Nim available for me to use in the first place!
 
-If you are interested in reading about what I have been programing in Nim, then you can find several Nim related articles on my blog here: [www.wiremoons.com](http://www.wiremoons.com/).
+If you are interested in reading about what I have been programming in Nim, then you can find several Nim related articles on my blog here: [www.wiremoons.com](http://www.wiremoons.com/).
 
 
 ## License
