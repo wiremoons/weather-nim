@@ -177,13 +177,13 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
         
         w.alertsDump.add fmt"""
  » Weather Alert 
-     Alert Title        : '{item.title}'
-     Region(s) Impacted : {regionAll}
-     Weather Severity   : '{toUpperAscii(item.severity)}'
+     Alert Title        : {item.title}
+     Region(s) Impacted : {strip(regionAll)}
+     Weather Severity   : {toUpperAscii(item.severity)}
      Alert Valid From   : {sdate}
      Alert Ending on    : {edate}
      Further Details    : {item.uri}
-     Alert Description: {item.description}"""
+     Alert Description  : {item.description}"""
     else:
       echo "No alert data found."
 

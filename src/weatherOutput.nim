@@ -51,12 +51,12 @@ CURRENT  WEATHER  FORECAST  DATA
  » Forecast Date        : {w.timeFormated}
 
  » Weather Currently
-     Summary            : '{w.summary}'
+     Summary            : {w.summary}
      Windspeed          : {w.windspeed:3.1f} mph
      Temperature        : {w.temperature:3.1f}{tUnit} feels like: {w.feelsLikeTemp:3.1f}{tUnit}
      UV Index           : {w.uvIndex}
-     Summary            : '{w.daysOutlook}'
-     Alerts Issued      : '{w.alertTotal}'
+     Summary            : {w.daysOutlook}
+     Alerts Issued      : {w.alertTotal}
      
 {w.alertsDump}
 
