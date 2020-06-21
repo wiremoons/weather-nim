@@ -6,7 +6,7 @@
 ## https://github.com/wiremoons/
 ##
 
-# import the required Nim language modules
+# import the required Nim standard library modules
 import strformat, terminal
 
 proc getYesNo*(question: string): bool =

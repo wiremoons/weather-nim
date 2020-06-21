@@ -1,35 +1,30 @@
-## Weather Forecast Retrieval Tool (weather)
 ##
 ## SOURCE FILE: dbgUtils.nim
-##
-## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
-## Source code available from GitHub: https://github.com/wiremoons/weather.git
 ## 
-## Weather forecast retrieval tool that uses the DarkSky API and weather data
-##
 ## MIT License
 ## Copyright (c) 2020 Simon Rowe
+## https://github.com/wiremoons/
 ##
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to
-# deal in the Software without restriction, including without limitation the
-# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-# sell copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-# IN THE SOFTWARE.
-#
-
 
 template debug*(data: untyped) =
+  ##
+  ## PROCEDURE: debug
+  ## Input: any debug message to include with the ouput
+  ## Returns: nothing
+  ## Description: a Nim template used to output debug messages
+  ## from the program. Is not used when a program is compiled
+  ## as a 'release' version - allowing automatic disabling of
+  ## debug output for final application builds. Output includes
+  ## any message passed to the tempate, along with the source code
+  ## file name and line number the debug message orignates from. 
+  ## To use, add this file 'dbgUtils.nim' to a project, and then
+  ## import it into any Nim source code where a debug message is
+  ## required. 
   when not defined(release):
     let pos = instantiationInfo()
     write(stderr, "DEBUG in " & pos.filename & ":" & $pos.line &
         " \"" & data & "\".\n")
+
+# Allow module to be run standalone for tests
+when isMainModule:
+  debug "This is a test debug message"
