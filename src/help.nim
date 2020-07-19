@@ -42,7 +42,7 @@ Settings
  any time.
  
  You can also edit the configuration file in a text editor to change your 
- location mnaually by altering the follow items: 
+ location manually by altering the follow items: 
  
       'placeName' 'placeCountry' 'placeUnits' 'latConfig' 'lonConfig'
  

@@ -1,0 +1,28 @@
+type
+  NilType = ref object
+  Object = ref object
+    place_id: int64
+    licence: string
+    osm_type: string
+    osm_id: int64
+    lat: string
+    lon: string
+    place_rank: int64
+    category: string
+    type: string
+    importance: int64
+    addresstype: string
+    name: string
+    display_name: string
+    address: Address
+    boundingbox: seq[string]
+  Address = ref object
+    golf_course: string
+    road: string
+    suburb: string
+    town: string
+    county: string
+    state: string
+    postcode: string
+    country: string
+    country_code: string

@@ -7,22 +7,6 @@
 ## MIT License
 ## Copyright (c) 2019 Simon Rowe
 ##
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to
-# deal in the Software without restriction, including without limitation the
-# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-# sell copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-# IN THE SOFTWARE.
-#
 
 # import Nim standard modules json, strformat,
 import json, strutils, terminal, strformat
@@ -61,10 +45,10 @@ proc getPlaceAddress*(): string =
   ## PROCEDURE: getPlaceAddress
   ## Input: none
   ## Returns: An address string provided by the user.
-  ## Description: Requests the user provides an in the form of a postal
-  ## address, town, city, or postcode/zip code for the  weather forecast
-  ## locattion. The entered string is has any spaces converted to '+' as
-  ## required by the Google and OSM APIs. The string is returned.
+  ## Description: Requests the user provides a postal address as either
+  ## town, city, or postcode/zip code for the  weather forecast
+  ## location. If the entered string has any spaces - then convert them to '+' 
+  ## as required by the Google and OSM APIs. The string is returned.
   ##
   # reset terminal to defaults on program exit
   system.addQuitProc(resetAttributes)
@@ -118,7 +102,7 @@ proc getPlaceRegion*(): string =
   country - where a few examples might be:
   
     United Kingdom = 'uk' or 'gb' ; South Africa = 'za' ; 
-    United States of America = 'us' ; Poland = 'pl' ;
+    United States of America = 'us' ; Poland = 'pl' ; Russia = 'ru' ;
     Norway = 'no' ; Italy = 'it' ; Japan = 'jp' ; Australia = 'au'.
   
   A full list can be found here: https://www.iso.org/obp/ui/
@@ -142,7 +126,6 @@ proc getPlaceRegion*(): string =
     else:
       stdout.styledWrite(fgRed, "ERROR: ", resetStyle)
       write(stdout, "enter an Alpha-2 country code without quotes : ")
-
 
 
 # URL format to lookup a postcode from Google Place API - must have '+' instead

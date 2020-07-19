@@ -1,0 +1,32 @@
+{
+  "place_id": 124464725,
+  "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+  "osm_type": "way",
+  "osm_id": 165058187,
+  "lat": "51.42116945",
+  "lon": "-3.296618577669139",
+  "place_rank": 30,
+  "category": "leisure",
+  "type": "golf_course",
+  "importance": 0,
+  "addresstype": "leisure",
+  "name": "Brynhill Golf Club",
+  "display_name": "Brynhill Golf Club, Sandringham Close, Colcot, Barry, Vale of Glamorgan, Wales, CF62 8BD, United Kingdom",
+  "address": {
+    "golf_course": "Brynhill Golf Club",
+    "road": "Sandringham Close",
+    "suburb": "Colcot",
+    "town": "Barry",
+    "county": "Vale of Glamorgan",
+    "state": "Wales",
+    "postcode": "CF62 8BD",
+    "country": "United Kingdom",
+    "country_code": "gb"
+  },
+  "boundingbox": [
+    "51.4178757",
+    "51.4244764",
+    "-3.3070994",
+    "-3.2848135"
+  ]
+}

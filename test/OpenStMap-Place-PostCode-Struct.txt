@@ -1,0 +1,26 @@
+type
+  NilType = ref object
+  SeqObject = seq[Object]
+  Object = ref object
+    place_id: int64
+    licence: string
+    osm_type: string
+    osm_id: int64
+    boundingbox: seq[string]
+    lat: string
+    lon: string
+    display_name: string
+    class: string
+    type: string
+    importance: float64
+    address: Address
+  Address = ref object
+    amenity: string
+    road: string
+    suburb: string
+    town: string
+    county: string
+    state: string
+    postcode: string
+    country: string
+    country_code: string

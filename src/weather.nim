@@ -48,8 +48,8 @@ while not getSettings(weather):
     """
 
 # Check for valid DarkSky API key - abort if none available. 
-# This step was added to the program on 05 June 2002 due to abuse of the
-# previously included DarkSky API Key
+# This step was added to the program on 05 June 2020 due to abuse of the
+# previously included DarkSky API Key.
 if weather.darkskyKey == "":
   echo ""
   echo "WARNING: No DarkSky API key found in the settings file..."
@@ -99,6 +99,8 @@ if needPlace and getYesNo("Would you like to add your weather forecast location?
     googlePlaceCheckUrl.add fmt"&region={getPlaceRegion()}"
     googlePlaceCheckUrl.add fmt"&key={weather.googleKey}"
     debug "final Google Place URL:" & googlePlaceCheckUrl
+    # get the place data using user provided address from OSM and process it
+    let rawGooglePlaceData = returnWebSiteData(googlePlaceCheckUrl, weather)
   else:
     # Fall back to OpenStreet Map place lookup
     # URL format to lookup a postcode from OpenStreet Map:
@@ -109,6 +111,9 @@ if needPlace and getYesNo("Would you like to add your weather forecast location?
     osmPlaceCheckUrl.add fmt"&q={getPlaceAddress()}"
     osmPlaceCheckUrl.add fmt"&format=json&limit=1"
     debug fmt"final OSM place URL: {osmPlaceCheckUrl}"
+    # get the place data using user provided address from OSM and process it
+    let rawOsmPlaceData = returnWebSiteData(osmPlaceCheckUrl, weather)
+    
 
 # create combined latitude and longitude into one variable for use in URLs:
 let latlong = fmt"{weather.latConfig},{weather.lonConfig}"
@@ -147,10 +152,10 @@ else:
   let placeJson = returnParsedJson(rawGeoData)
   extractOsmPlace(weather, placeJson)
 
-# obtain variables with better formating or additional infor for output
+# obtain variables with better formatting or additional info for output
 weather.latBearing = if weather.latitude < 0: "°S" else: "°N"
 weather.lonBearing = if weather.longitude < 0: "°W" else: "°E"
-# convert int64 with Unix Epoch to formated date time string
+# convert int64 with Unix Epoch to formatted date time string
 weather.timeFormated = fromUnix(weather.forecastTime).format("ddd dd MMM yyyy HH:mm:ss")
 
 # run proc to output all collated weather information

@@ -1,0 +1,31 @@
+[
+  {
+    "place_id": 13564678,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+    "osm_type": "node",
+    "osm_id": 1243103215,
+    "boundingbox": [
+      "51.3978527",
+      "51.3979527",
+      "-3.2876881",
+      "-3.2875881"
+    ],
+    "lat": "51.3979027",
+    "lon": "-3.2876381",
+    "display_name": "CF62 9, Harbour Road, The Knap, Barry, Vale of Glamorgan, Wales, CF62 5SA, United Kingdom",
+    "class": "amenity",
+    "type": "post_box",
+    "importance": 0.101,
+    "address": {
+      "amenity": "CF62 9",
+      "road": "Harbour Road",
+      "suburb": "The Knap",
+      "town": "Barry",
+      "county": "Vale of Glamorgan",
+      "state": "Wales",
+      "postcode": "CF62 5SA",
+      "country": "United Kingdom",
+      "country_code": "gb"
+    }
+  }
+]
