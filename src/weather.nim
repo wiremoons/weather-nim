@@ -5,7 +5,7 @@
 ## Created by Simon Rowe <simon@wiremoons.com> on 03 Nov 2019
 ## Source code available from GitHub: https://github.com/wiremoons/weather.git
 ## 
-## Weather forecast retrieval tool that uses the DarkSky API and weather data.
+## Command line (CLI) weather forecast retrieval tool.
 ##
 ## MIT License. Copyright (c) 2020 Simon Rowe
 

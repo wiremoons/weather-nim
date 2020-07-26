@@ -1,5 +1,0 @@
-FATAL ERROR: web site returned unexpected status of: 401 Unauthorized
-
-Data received:
-
-{"code":401,"error":"permission denied"}

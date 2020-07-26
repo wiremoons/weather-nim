@@ -1,8 +1,8 @@
 # Package
 
-version       = "0.8.3"
+version       = "0.9.0"
 author        = "Simon Rowe"
-description   = "Command line tool to retrieve the current weather forecast from DarkSky"
+description   = "Command line tool to retrieve the current weather forecast"
 license       = "MIT"
 srcDir        = "src"
 bin           = @["weather"]
