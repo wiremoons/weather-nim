@@ -3,6 +3,17 @@
 # weather
 Command line application to obtain current weather forecast from DarkSky.
 
+**UPDATE: 26 June 2020** the code base from version '0.9.0' inward will not 
+include support for DarkSky API. Apple purchased the DarkSky company and support 
+for using the API for any new people is no longer available. Therefore I am 
+going to try and re-develop the application to use open source weather APIs only. 
+The look up of geoloaction information from Open Street Map has already been 
+added as an alternative to the original Google Places look up. The aim will be 
+to re-write the application so it no longer needs to use closed APIs or those 
+that require the user to pay for using the service. Hopefully the forecast 
+accuracy won't suffer as a consequence, but it should also allow the program to 
+be used by a wider audience of more 'casual' users too.  
+
 **UPDATE: 05 June 2020** up to this date I had included my DarkSky API key
 within the application to allow others to make use of the program more easily.
 Sadly from this date the API key is no longer included within the program as a 
@@ -53,7 +64,7 @@ All is well.
 
 The application configuration settings are stored in a file located on your 
 computer in different locations, depending on the operating system the program 
-is being run on. On Linux the seeting file will be located here:
+is being run on. On Linux the setting file will be located here:
 ```
 $HOME/.config/weatherApp/settings.ini'
 ```
@@ -124,7 +135,7 @@ The instruction below are for Linux, and have been tested on Raspbian '*Buster*'
 
 To build 'weather' from source on a Linux based system, the following steps can be used:
 
-1. Install the Nim compiler and a C compiler such as gcc or CLang, plus the OpenSSL library. More information on installing Nim can be found here: [Nim Download](https://nim-lang.org/install.html).
+1. Install the Nim compiler and a C compiler such as GCC or Clangs, plus the OpenSSL library. More information on installing Nim can be found here: [Nim Download](https://nim-lang.org/install.html).
 2. Once Nim is installed and working on your system, you can clone this GitHub repo with the command: `git clone https://github.com/wiremoons/weather.git`
 3. Then in the cloned code directory for `weather` use Nimble to build a release version with the command: `nimble release`.   Other Nimble build commands can be seen by running: `nimble tasks`.
 4. The compiled binary of `weather` can now be found in the `./bin` sub directory. Just copy it somewhere in you path, and it should work when run.
@@ -142,7 +153,7 @@ The instruction below have been tested on Windows 10 only, but should perform th
 
 The quickest way I have found to install Nim and then build the `weather` program your self is following the steps:
 
-1. Open a POwershell command line window
+1. Open a Powershell command line window
 2. Install the packages manager [scoop](https://scoop.sh/) by running: `iwr -useb get.scoop.sh | iex`
 3. Install the packages: Nim; OpenSSL; Git; and GCC: `scoop install nim openssl git gcc`
 4. Clone the *Weather* projects to your computer: `git clone https://github.com/wiremoons/weather.git`
