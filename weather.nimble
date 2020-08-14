@@ -18,6 +18,10 @@ task release, "Builds a release version":
   echo("\nRelease Build...\n")
   exec("nimble build -d:release --gc:orc --passC:-march=native")
 
+task static, "Builds a 'static' release version":
+  echo("\n'Static' Release Build...\n")
+  exec("nimble build -d:release --gc:orc --passC:-march=native --passL:-static")
+
 task debug, "Builds a debug version":
   echo("\nDebug Build\n")
   exec("nimble build --gc:orc -d:debug --lineDir:on --debuginfo --debugger:native")
