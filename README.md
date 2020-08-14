@@ -6,11 +6,14 @@ Command line application to obtain current weather forecast from DarkSky.
 **UPDATE: 26 June 2020** the code base from version '0.9.0' onwards will not 
 include support for DarkSky API. Apple purchased the DarkSky company and support 
 for using the API for any new people is no longer available. Therefore I am 
-going to try and re-develop the application to use open source weather APIs only. 
-The look up of geoloaction information from Open Street Map has already been 
-added as an alternative to the original Google Places look up. The aim will be 
-to re-write the application so it no longer needs to use closed APIs or those 
-that require the user to pay for using the service. Hopefully the forecast 
+going to try and re-develop the application to use open source weather APIs only, 
+or if not feasible (still checking options!) &mdash; a commercial API that offers 
+'free' tier accounts. That will allow users to obtain their own API key to be able 
+to use the program. The look up of geo-location information from Open Street Map 
+has already been added as an alternative to the original Google Places look up. 
+The aim will be to re-write the application so it no longer needs to use closed 
+APIs or those that require the user to pay for using the service, if that usage 
+is only casual, and occasional. Hopefully the forecast 
 accuracy and features won't suffer as a consequence, but it should also allow 
 the program to be used by a wider audience of more 'casual' users too.  
 
