@@ -183,6 +183,12 @@ $env:DSAPI="add_api_key_here"
 
 One of the key benefits of having an application developed in Nim is that the resulting application is compiled in to a single binary file. The Windows version also requires a OpenSSL library, that is used to secure the communications with the DarkSky weather forecast site.
 
+If you have [Nimble](https://github.com/nim-lang/nimble) installed on your system, this program can be installed with the command:
+```
+nimble install https://github.com/wiremoons/weather
+```
+
+
 **ADD MORE INFO HERE**
 
 
