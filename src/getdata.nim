@@ -15,7 +15,7 @@ proc returnWebSiteData*(webUrl: string, w: Weather): string =
   ##
   ## PROCEDURE: returnWebSiteData
   ## Input: final URL for DarkSky site to obtain forecast and Weather object
-  ## Returns: raw web page body recieved and daily API calls count via w object
+  ## Returns: raw web page body received and daily API calls count via w object
   ## Description: open the provided URL returning the web site content received
   ## also extract HTTP header to obtain API calls total. API calls total is
   ## updated directly into the Weather (w) passed to the proc.
@@ -25,8 +25,8 @@ proc returnWebSiteData*(webUrl: string, w: Weather): string =
   let response = client.get(webUrl)
   result = response.body
 
-  debug "web site reponse: " & response.status
-  # output all recived web site data with below if needed
+  debug "web site response: " & response.status
+  # output all received web site data with below if needed
   #debug "web data receivedL " & result
 
   if response.code != Http200:
@@ -147,8 +147,8 @@ proc extractWeather*(w: Weather, jsonDataWeather: JsonNode) =
       w.alertTotal = newAlertsSeq.len
       debug fmt"found total 'weather Alerts': {w.alertTotal}"
       #var
-      # for each weather alert found extract into a formated
-      # for displayed as a formated block in the final
+      # for each weather alert found extract into a formatted
+      # for displayed as a formatted block in the final
       for item in newAlertsSeq:
         # echo repr(item)
         let sdate:string = $fromUnix(item.time).format("ddd dd MMM yyyy HH:mm:ss")

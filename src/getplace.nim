@@ -8,7 +8,7 @@
 ## Copyright (c) 2019 Simon Rowe
 ##
 
-# import Nim standard modules json, strformat,
+# import Nim standard modules json, strformat
 import json, strutils, terminal, strformat
 # import local code modules
 import types, dbgUtils
