@@ -7,7 +7,7 @@
 ##
 
 # import the required Nim standard library modules
-import strformat, terminal
+import std/exitprocs, strformat, terminal
 
 proc getYesNo*(question: string): bool =
   ##
@@ -16,12 +16,13 @@ proc getYesNo*(question: string): bool =
   ## Returns: a boolean where user response is: true == yes || false == no
   ## Description: the question string is printed to the screen so the
   ## user can respond with a 'yes' or 'no' response. Accepts different
-  ## forms of 'yes' or 'no' to suit the user prefered approach to 
+  ## forms of 'yes' or 'no' to suit the user prefered approach to
   ## answering.
   ##
 
   # reset terminal to defaults on program exit
-  system.addQuitProc(resetAttributes)
+  #system.addQuitProc(resetAttributes) <- depreciated
+  addExitProc(resetAttributes)
 
   # output provided question to the user:
   write(stdout, "\n » QUESTION: ")
