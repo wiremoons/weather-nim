@@ -42,7 +42,7 @@ proc createDefaultSettings*() =
 
   let confFileDefault = setConfigFile()
 
-  if existsFile(confFileDefault):
+  if fileExists(confFileDefault):
     debug fmt"config file exists: '{confFileDefault}' - aborting writing a new default"
     echo "Warning: attempting to create default settings file when it already exist."
     echo "Existing settings file here: '{confFileDefault}' - skipping overwrite..."
@@ -78,7 +78,7 @@ proc getSettings*(w: Weather): bool =
   result = false
   let confFile = setConfigFile()
 
-  if existsFile(confFile):
+  if fileExists(confFile):
     debug fmt"config file exists: '{confFile}'"
     debug fmt"loading settings from: '{confFile}'"
 
@@ -122,7 +122,7 @@ proc putSettings*(w: Weather) =
   ##
   let confFile = setConfigFile()
 
-  if not existsFile(confFile):
+  if not fileExists(confFile):
     debug fmt"*Error* config file: '{confFile}'... missing in proc 'putSettings()'"
 
   var dict = newConfig()
