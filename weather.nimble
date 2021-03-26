@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.9.0"
+version       = "0.9.1"
 author        = "Simon Rowe"
 description   = "Command line tool to retrieve the current weather forecast"
 license       = "MIT"
