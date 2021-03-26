@@ -9,7 +9,7 @@
 ##
 
 # import Nim standard modules json, strformat
-import json, strutils, terminal, strformat
+import json, strutils, terminal, strformat, std/exitprocs
 # import local code modules
 import types, dbgUtils
 
@@ -47,11 +47,12 @@ proc getPlaceAddress*(): string =
   ## Returns: An address string provided by the user.
   ## Description: Requests the user provides a postal address as either
   ## town, city, or postcode/zip code for the  weather forecast
-  ## location. If the entered string has any spaces - then convert them to '+' 
+  ## location. If the entered string has any spaces - then convert them to '+'
   ## as required by the Google and OSM APIs. The string is returned.
   ##
   # reset terminal to defaults on program exit
-  system.addQuitProc(resetAttributes)
+  #system.addQuitProc(resetAttributes) <- depreciated
+  addExitProc(resetAttributes)
   stdout.styledWrite(fgGreen, "\nProvide an Address", resetStyle)
   echo fmt"""
 
