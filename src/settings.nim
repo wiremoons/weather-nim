@@ -7,10 +7,14 @@
 ##
 
 # import the required Nim standard library modules
-import os, parsecfg, strformat
+import os, parsecfg
 
 # import our own modules from this apps source code repo
 import types, dbgUtils
+
+# module only requirec in 'debug' mode
+when not defined(release):
+  import strformat
 
 proc setConfigFile*(): string =
   ##
