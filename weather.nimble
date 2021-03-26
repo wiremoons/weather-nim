@@ -16,11 +16,13 @@ requires "nim >= 1.0.2"
 
 task release, "Builds a release version":
   echo("\nRelease Build...\n")
-  exec("nimble build -d:release --gc:orc --passC:-march=native")
+  #exec("nimble build -d:release --gc:orc --passC:-march=native")
+  exec("nimble build -d:release --gc:orc")
 
 task static, "Builds a 'static' release version":
   echo("\n'Static' Release Build...\n")
-  exec("nimble build -d:release --gc:orc --passC:-march=native --passL:-static")
+  #exec("nimble build -d:release --gc:orc --passC:-march=native --passL:-static")
+  exec("nimble build -d:release --gc:orc --passL:-static")
 
 task debug, "Builds a debug version":
   echo("\nDebug Build\n")
