@@ -11,6 +11,9 @@
 # Unignore LICENSE
 !LICENSE
 
+# pesky macOS files
+.DS_Store
+
 # directories to exclude form Git repo
 nimcache/
 nimblecache/
