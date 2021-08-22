@@ -22,6 +22,7 @@ task release, "Builds a release version":
 task static, "Builds a 'static' release version":
   echo("\n'Static' Release Build...\n")
   #exec("nimble build -d:release --gc:orc --passC:-march=native --passL:-static")
+  #exec("nimble build -d:release --gc:orc --passL:-static --dynlibOverride:ssl --passl:-lcrypto --passl:-lssl")
   exec("nimble build -d:release --gc:orc --passL:-static")
 
 task debug, "Builds a debug version":
